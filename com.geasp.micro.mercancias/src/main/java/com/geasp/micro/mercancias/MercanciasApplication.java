@@ -36,4 +36,5 @@ public class MercanciasApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MercanciasApplication.class, args);
 	}
+	
 }
