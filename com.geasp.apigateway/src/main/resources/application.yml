@@ -1,0 +1,42 @@
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true  
+#    serviceUrl:
+#      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+#  instance:
+#    preferIpAddress: true
+#    hostname: ${$HOSTNAME:localhost}
+#
+#spring:
+#  application:
+#    name: zuul-api-gateway
+#
+#server:
+#  port: 8888
+#  
+#zuul:
+#  prefix: /api
+#  sensitiveHeaders: Cookie,Set-Cookie
+#  routes:
+#    mercancias:
+#      path: /mercancias/**
+#      service-id: MICROSERVICIO-MERCANCIAS
+#      #url: http://127.0.0.1:8881
+#    nomencladores:
+#      path: /nomencladores/**
+#      service-id: MICROSERVICIO-NOMENCLADORES
+#      #url: http://127.0.0.1:3000
+#    operaciones:
+#      path: /operaciones/**
+#      service-id: MICROSERVICIO-OPERACIONES
+#      #url: http://127.0.0.1:8882
+#    partes:
+#      path: /partes/**
+#      service-id: MICROSERVICIO-PARTES
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'     
+  

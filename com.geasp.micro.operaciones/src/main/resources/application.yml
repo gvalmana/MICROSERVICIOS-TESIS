@@ -1,0 +1,42 @@
+#server:
+#  port: 8882
+#
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true  
+#    serviceUrl:
+#      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+#  instance:
+#    preferIpAddress: true
+#    hostname: ${$HOSTNAME:localhost}
+#spring:
+#  application:
+#    name: microservicio-operaciones
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/bd_operaciones?zeroDateTimeBehavior=convertToNull&serverTimeZone=UTC
+#    username: root
+#    password: ""
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#  main:
+#    allow-bean-definition-overriding: true
+#  
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'
+#
+#keycloak:
+#  realm: GEASP     
+#  auth-server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8180}/auth 
+#  resource: micro-mercancias
+#  public-client: true
+#  use-resource-role-mappings: true
+#  principal-attribute: preferred_username
+#  bearer-only: true
+#  enabled: true
+    

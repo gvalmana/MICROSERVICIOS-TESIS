@@ -1,0 +1,38 @@
+#server:
+#  port: 9090
+#  
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true  
+#    serviceUrl:
+#      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+#  instance:
+#    preferIpAddress: true
+#    hostname: ${$HOSTNAME:localhost}
+#
+#spring:
+#  application:
+#    name: admin-server
+#  main:
+#    allow-bean-definition-overriding: true
+#  boot:
+#    admin:
+#      context-path: /admin
+# 
+#keycloak:
+#  realm: GEASP
+#  auth-server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8180}/auth
+#  resource: app-admin
+#  credentials:
+#     secret: 40140c53-3e97-4fa3-8485-75255c03a4a7
+#  ssl-required: external
+#  principal-attribute: preferred_username
+#  use-resource-role-mappings: true
+#  token-minimum-time-to-live: 30
+#  
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'

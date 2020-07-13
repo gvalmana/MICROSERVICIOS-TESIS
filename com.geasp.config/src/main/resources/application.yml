@@ -1,0 +1,28 @@
+server:
+  port: 9091
+
+spring:
+  application:
+    name: config-server
+    description: Servidor de configuraciones
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${HOME}/code/configrepo
+        prefix: /config
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true  
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+  instance:
+    preferIpAddress: true
+    hostname: ${$HOSTNAME:localhost}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

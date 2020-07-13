@@ -1,0 +1,22 @@
+#server:
+#  port: 8883
+#
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true  
+#    serviceUrl:
+#      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+#  instance:
+#    preferIpAddress: true
+#    hostname: ${$HOSTNAME:localhost}
+#
+#spring:
+#  application:
+#    name: microservicio-partes
+#
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'
