@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.geasp.micro.operaciones.requests.ExtraccionRequest;
+import com.geasp.micro.operaciones.requests.OperacionRequest;
 import com.geasp.micro.operaciones.responses.ExtraccionResponse;
 import com.geasp.micro.operaciones.services.IOperacionesService;
 
@@ -34,14 +34,14 @@ import com.geasp.micro.operaciones.services.IOperacionesService;
 				RequestMethod.OPTIONS}, 
 		allowedHeaders = "*", 
 		allowCredentials = "true" )
-public class ExtraccionesController implements IControllers<ExtraccionResponse,ExtraccionRequest> {
+public class ExtraccionesController implements IControllers<ExtraccionResponse,OperacionRequest> {
 
 	@Autowired
-	IOperacionesService<ExtraccionResponse, ExtraccionRequest> service;
+	IOperacionesService<ExtraccionResponse, OperacionRequest> service;
 	
 	@Override
 	@PostMapping(value = "/{id}")
-	public ResponseEntity<ExtraccionResponse> Save(@RequestBody @Valid ExtraccionRequest entity, @PathVariable("id") Long id) {
+	public ResponseEntity<ExtraccionResponse> Save(@RequestBody @Valid OperacionRequest entity, @PathVariable("id") Long id) {
 		return ResponseEntity.ok(service.registrar(entity, id));
 	}
 
@@ -59,7 +59,7 @@ public class ExtraccionesController implements IControllers<ExtraccionResponse,E
 
 	@Override
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<ExtraccionResponse> updateById(@RequestBody @Valid ExtraccionRequest data, @PathVariable("id")  Long id) {
+	public ResponseEntity<ExtraccionResponse> updateById(@RequestBody @Valid OperacionRequest data, @PathVariable("id")  Long id) {
 		return ResponseEntity.ok(service.updateById(data, id));
 	}
 

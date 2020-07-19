@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -12,6 +13,7 @@ import org.springframework.data.history.RevisionMetadata;
 
 @Entity
 @Table(name = "tbl_cargas", catalog = "bd_mercancias")
+@PrimaryKeyJoinColumn(name = "id")
 @Audited
 public class Carga extends Mercancia {
 

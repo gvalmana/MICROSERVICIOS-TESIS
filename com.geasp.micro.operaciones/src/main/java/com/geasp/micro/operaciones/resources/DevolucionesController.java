@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.geasp.micro.operaciones.requests.DevolucionRequest;
+import com.geasp.micro.operaciones.requests.OperacionRequest;
 import com.geasp.micro.operaciones.responses.DevolucionResponse;
 import com.geasp.micro.operaciones.services.IOperacionesService;
 
@@ -34,14 +34,14 @@ import com.geasp.micro.operaciones.services.IOperacionesService;
 				RequestMethod.OPTIONS}, 
 		allowedHeaders = "*", 
 		allowCredentials = "true" )
-public class DevolucionesController implements IControllers<DevolucionResponse, DevolucionRequest>{
+public class DevolucionesController implements IControllers<DevolucionResponse, OperacionRequest>{
 
 	@Autowired
-	IOperacionesService<DevolucionResponse, DevolucionRequest> service;
+	IOperacionesService<DevolucionResponse, OperacionRequest> service;
 	
 	@Override
 	@PostMapping(value = "/{id}")
-	public ResponseEntity<DevolucionResponse> Save(@RequestBody @Valid DevolucionRequest entity, @PathVariable("id") Long id) {
+	public ResponseEntity<DevolucionResponse> Save(@RequestBody @Valid OperacionRequest entity, @PathVariable("id") Long id) {
 		return ResponseEntity.ok(service.registrar(entity, id));
 	}
 
@@ -59,7 +59,7 @@ public class DevolucionesController implements IControllers<DevolucionResponse, 
 
 	@Override
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<DevolucionResponse> updateById(@RequestBody @Valid DevolucionRequest data, @PathVariable("id") Long id) {
+	public ResponseEntity<DevolucionResponse> updateById(@RequestBody @Valid OperacionRequest data, @PathVariable("id") Long id) {
 		return ResponseEntity.ok(service.updateById(data, id));
 	}
 

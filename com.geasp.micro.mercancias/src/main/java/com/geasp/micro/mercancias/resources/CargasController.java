@@ -88,17 +88,5 @@ public class CargasController implements IMercanciaControllers<CargaResponse, Ca
 	@GetMapping(value = "/pendientes")
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendietnes(){
 		return ResponseEntity.ok(parte.listarPendientes());
-	}
-
-	@Override
-	@PostMapping(value = "/extraer/{id}")
-	public ResponseEntity<CargaResponse> extraerById(@PathVariable("id") Long id) {
-		return ResponseEntity.ok(service.extractById(id));
-	}
-
-	@Override
-	@PostMapping(value = "/revertir/{id}")
-	public ResponseEntity<CargaResponse> revertirById(@PathVariable("id") Long id) {
-		return ResponseEntity.ok(service.revertById(id));
 	}	
 }

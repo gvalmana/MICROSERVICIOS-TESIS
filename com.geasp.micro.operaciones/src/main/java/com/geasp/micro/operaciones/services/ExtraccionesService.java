@@ -21,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.geasp.micro.operaciones.models.Extraccion;
 import com.geasp.micro.operaciones.models.Mercancia;
 import com.geasp.micro.operaciones.repositories.ExtraccionRepository;
-import com.geasp.micro.operaciones.requests.ExtraccionRequest;
+import com.geasp.micro.operaciones.requests.OperacionRequest;
 import com.geasp.micro.operaciones.responses.ExtraccionResponse;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
@@ -30,7 +30,7 @@ import org.dozer.Mapper;
 import org.keycloak.KeycloakSecurityContext;
 
 @Service
-public class ExtraccionesService implements IOperacionesService<ExtraccionResponse, ExtraccionRequest>{
+public class ExtraccionesService implements IOperacionesService<ExtraccionResponse, OperacionRequest>{
 	
 	@Autowired
 	private ExtraccionRepository extracciones;
@@ -93,7 +93,7 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 	})
 	@Override
-	public ExtraccionResponse registrar(ExtraccionRequest entity, Long id) {
+	public ExtraccionResponse registrar(OperacionRequest entity, Long id) {
 		try {
 			Mercancia mercancia = extract(id).getBody();
 			if (mercancia.getId()==id) {
@@ -114,7 +114,7 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 	}
 	
 	@SuppressWarnings("unused")
-	private ExtraccionResponse getFallbackCreate(ExtraccionRequest request, Long id){
+	private ExtraccionResponse getFallbackCreate(OperacionRequest request, Long id){
 		return new ExtraccionResponse("Ha ocurrido al registrar la operación.");
 	}	
 	
@@ -187,7 +187,7 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
 			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 	})	
-	public ExtraccionResponse updateById(ExtraccionRequest request, Long id) {
+	public ExtraccionResponse updateById(OperacionRequest request, Long id) {
 		try {
 			Optional<Extraccion> extraccionOptional= extracciones.findByMercanciaId(id);
 			if (extraccionOptional.isPresent() && comprobar(extraccionOptional)) {
@@ -209,7 +209,7 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 	}
 
 	@SuppressWarnings("unused")
-	private ExtraccionResponse getFallbackUpdate(ExtraccionRequest request, Long id){
+	private ExtraccionResponse getFallbackUpdate(OperacionRequest request, Long id){
 		return new ExtraccionResponse("Ha ocurrido un error al actualizar.");
 	}	
 	

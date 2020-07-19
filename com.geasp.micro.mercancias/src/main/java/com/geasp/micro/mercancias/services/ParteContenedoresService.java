@@ -57,9 +57,6 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 	@Value("${estadia.maximo}")
 	private int estadiaMaximo;
 	
-	@Value("${partes.operaciones.contenedores.nombre}")
-	private String titulo;
-	
 	public ResumenContenedores makePartefallback(LocalDate date) {
 		return new ResumenContenedores("Error en la confección del parte de los contenedores.");
 	}
@@ -146,7 +143,7 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 		res.setEnRiesgo(enRiesgo);
 		res.setListosParaExtraer(listosParaExtraer);
 		res.setPendientesDevolver(pendientesParaDevolver);
-		res.setResumenEntradas(new Operaciones(resumenOperaciones,titulo));
+		res.setResumenEntradas(new Operaciones(resumenOperaciones,"Entradas de contenedores en el día "+date.toString()));
 		
 		List<Contenedor> porHabilitar = paraExtraer.stream().filter(index->{
 			return index.getFecha_habilitacion()==null;

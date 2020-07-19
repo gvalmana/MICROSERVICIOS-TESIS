@@ -53,9 +53,6 @@ public class ParteGuiasService implements IParteService<ResumenGuias>{
 	@Value("${estadia.guias}")
 	private int estadiaGuias;
 	
-	@Value("${partes.operaciones.guias.nombre}")
-	private String titulo;	
-	
 	public ResumenGuias makePartefallback(LocalDate date){
 		return new ResumenGuias("Error en la confección del parte de las guías aéras.");
 	}
@@ -106,7 +103,7 @@ public class ParteGuiasService implements IParteService<ResumenGuias>{
 		res.setEnEstadia(enEstadia);
 		res.setPendientesHabilitar(porHabilitar.size());
 		res.setGuiasHabilitadas(paraExtraer.size()-porHabilitar.size());
-		res.setResumenEntradas(new Operaciones(resumenOperaciones, titulo));
+		res.setResumenEntradas(new Operaciones(resumenOperaciones, "Entradas de guías aéreas en el día "+date.toString()));
 		res.setPendientesAlistar(
 				new PendientesAlistar(
 						listarPorEmpresas(porHabilitar), 

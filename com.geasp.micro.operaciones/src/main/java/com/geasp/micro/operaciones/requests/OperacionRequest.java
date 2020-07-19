@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
 
-public class ExtraccionRequest implements Serializable{
+public class OperacionRequest implements Serializable{
 
 	/**
 	 * 
@@ -24,7 +24,7 @@ public class ExtraccionRequest implements Serializable{
 		this.fecha = fecha;
 	}
 
-	public ExtraccionRequest() {
+	public OperacionRequest() {
 		super();
 	}
 	

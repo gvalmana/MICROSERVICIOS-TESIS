@@ -26,7 +26,7 @@ import com.geasp.micro.operaciones.models.Extraccion;
 import com.geasp.micro.operaciones.models.Mercancia;
 import com.geasp.micro.operaciones.repositories.DevolucionRepository;
 import com.geasp.micro.operaciones.repositories.ExtraccionRepository;
-import com.geasp.micro.operaciones.requests.DevolucionRequest;
+import com.geasp.micro.operaciones.requests.OperacionRequest;
 import com.geasp.micro.operaciones.responses.DevolucionResponse;
 import com.geasp.micro.operaciones.responses.ExtraccionResponse;
 //import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
@@ -37,7 +37,7 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 @Service
-public class DevolucionesService implements IOperacionesService<DevolucionResponse, DevolucionRequest> {
+public class DevolucionesService implements IOperacionesService<DevolucionResponse, OperacionRequest> {
 	
 	@Autowired
 	private DevolucionRepository devoluciones;
@@ -135,7 +135,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
 			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 	})	
-	public DevolucionResponse registrar(DevolucionRequest entity, Long id) {
+	public DevolucionResponse registrar(OperacionRequest entity, Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);			
 			if (optionalExtraccion.isPresent() && comprobar(optionalExtraccion)) {
@@ -161,7 +161,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 		}
 	}
 	@SuppressWarnings("unused")
-	private DevolucionResponse getFallbackCreate(DevolucionRequest request, Long id){
+	private DevolucionResponse getFallbackCreate(OperacionRequest request, Long id){
 		return new DevolucionResponse("Ha ocurrido al registrar la operación.");
 	}	
 
@@ -238,7 +238,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
 			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 	})	
-	public DevolucionResponse updateById(DevolucionRequest request, Long id) {
+	public DevolucionResponse updateById(OperacionRequest request, Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);
 			Optional<Devolucion> optionalDevolucion = devoluciones.findByExtraccion(optionalExtraccion.get());
@@ -263,7 +263,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 	}
 
 	@SuppressWarnings("unused")
-	private DevolucionResponse getFallbackUpdate(DevolucionRequest request, Long id){
+	private DevolucionResponse getFallbackUpdate(OperacionRequest request, Long id){
 		return new DevolucionResponse("Ha ocurrido un error al actualizar.");
 	}
 	

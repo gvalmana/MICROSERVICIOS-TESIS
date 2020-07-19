@@ -16,6 +16,4 @@ public interface IMercanciaControllers<T,R> {
 	public ResponseEntity<T> updateById(R data, Long id);
 	public ResponseEntity<T> desactivateById(Long id);
 	public ResponseEntity<List<T>> getAllByState(EstadoMercancias estado);
-	public ResponseEntity<T> extraerById(Long id);
-	public ResponseEntity<T> revertirById(Long id);
 }

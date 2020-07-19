@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -40,18 +39,6 @@ public class ParteService implements IParteService{
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;
-	
-	@Value("${parte.error}")
-	private String textoError;
-	
-	@Value("${parte.contenedores.nombre}")
-	private String tituloContenedores;
-	
-	@Value("${parte.guias.nombre}")
-	private String tituloGuias;
-	
-	@Value("${parte.cargas.nombre}")
-	private String tituloCargas;
 	
 	private ResponseEntity<Mercancia> get(Long id) {
 		HttpHeaders headers = new HttpHeaders();
@@ -111,7 +98,7 @@ public class ParteService implements IParteService{
 				}).collect(Collectors.toList());		
 		List<CantidadEmpresa> listaExtraccion = listarExtraccionesPorEmpresas(lista);
 		Operaciones contenedores = new Operaciones(
-				tituloContenedores,
+				"Salidas de contenedores en el dia "+fecha.toString(),
 				listaExtraccion
 				);
 		return contenedores;
@@ -127,7 +114,7 @@ public class ParteService implements IParteService{
 				.collect(Collectors.toList());
 		List<CantidadEmpresa> listaExtraccion = listarExtraccionesPorEmpresas(lista);
 		Operaciones cargas = new Operaciones(
-				tituloCargas,
+				"Salidas de cargas agrupadas en el dia "+fecha.toString(),
 				listaExtraccion
 				);
 		return cargas;		
@@ -138,16 +125,16 @@ public class ParteService implements IParteService{
 		List<Extraccion> lista = extracciones.findByFechaAndTipoMercancia(fecha, "Guia");
 		List<CantidadEmpresa> listaExtraccion = listarExtraccionesPorEmpresas(lista);		
 		Operaciones guias = new Operaciones(
-				tituloGuias,
+				"Salidas de guías aéreas en el dia "+fecha.toString(),
 				listaExtraccion
 				);
 		return guias;		
 	}
 
 	public ParteResponse makeParteFallBack(String date){
-		Operaciones contenedores = new Operaciones(textoError);
-		Operaciones cargas = new Operaciones(textoError);
-		Operaciones guias = new Operaciones(textoError);
+		Operaciones contenedores = new Operaciones("Error al confeccionar el parte.");
+		Operaciones cargas = new Operaciones("Error al confeccionar el parte.");
+		Operaciones guias = new Operaciones("Error al confeccionar el parte.");
 		return new ParteResponse(contenedores, cargas, guias);
 	}
 	

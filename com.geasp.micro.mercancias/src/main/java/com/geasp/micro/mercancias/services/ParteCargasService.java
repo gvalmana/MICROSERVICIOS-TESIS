@@ -56,9 +56,6 @@ public class ParteCargasService implements IParteService<ResumenCargas>{
 	@Value("${estadia.maximo}")
 	private int estadiaMaximo;
 	
-	@Value("${partes.operaciones.cargas.nombre}")
-	private String titulo;	
-	
 	public ResumenCargas makePartefallback(LocalDate date){
 		return new ResumenCargas("Error en la confección del parte de las cargas agrupadas.");
 	}
@@ -108,7 +105,7 @@ public class ParteCargasService implements IParteService<ResumenCargas>{
 		res.setTotal(paraExtraer.size());
 		res.setListosParaExtraer(listosParaExtraer);
 		res.setEnEstadia(enEstadia);
-		res.setResumenEntradas(new Operaciones(resumenOperaciones, titulo));
+		res.setResumenEntradas(new Operaciones(resumenOperaciones, "Entradas de cargas en el día "+date.toString()));
 		res.setPendientesAlistar(
 				new PendientesAlistar(
 						listarPorEmpresas(porHabilitar), 
