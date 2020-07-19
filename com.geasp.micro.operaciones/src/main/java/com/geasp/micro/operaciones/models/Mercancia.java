@@ -11,6 +11,7 @@ public class Mercancia {
     protected Calendar creationDate;
 	@JsonFormat(pattern="yyyy-MM-dd")
     protected Calendar lastModifiedDate;
+	
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private LocalDate fecha_arribo;
 	@JsonFormat(pattern="yyyy-MM-dd")
