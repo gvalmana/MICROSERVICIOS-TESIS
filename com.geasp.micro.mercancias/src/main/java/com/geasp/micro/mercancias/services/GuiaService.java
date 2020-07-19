@@ -173,10 +173,46 @@ public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>
 				List<GuiaResponse> response = llenarLista(guias);
 				return response.stream().collect(Collectors.toList());
 			} else {
-				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de guías aereas no encontrados");
+				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de guías no encontrados");
 			}
 		} catch (ResponseStatusException e) {
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
+
+	@Override
+	public GuiaResponse extractById(Long id) {
+		try {
+			Optional<Guia> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				return crearRespuesta(optional,EstadoMercancias.EXTRAIDA);
+			} else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La guía a extraer no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public GuiaResponse revertById(Long id) {
+		try {
+			Optional<Guia> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				return crearRespuesta(optional,EstadoMercancias.LISTO_PARA_EXTRAER);
+			} else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La guía a revertir no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+	private GuiaResponse crearRespuesta(Optional<Guia> optional, EstadoMercancias estado) {
+		Guia mercancia = optional.get();
+		mercancia.setEstado(estado);
+		dao.saveAndFlush(mercancia);
+		GuiaResponse response = mapper.map(mercancia, GuiaResponse.class);
+		mappearDatos(mercancia, response);
+		return response;
+	}	
 }

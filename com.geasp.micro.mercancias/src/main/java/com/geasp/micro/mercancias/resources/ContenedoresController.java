@@ -23,7 +23,7 @@ import com.geasp.micro.mercancias.requests.ContenedorRequest;
 import com.geasp.micro.mercancias.responses.ContenedorResponse;
 import com.geasp.micro.mercancias.responses.ResumenContenedores;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
-import com.geasp.micro.mercancias.services.IMercanciaService;
+import com.geasp.micro.mercancias.services.ContenedorService;
 import com.geasp.micro.mercancias.services.ParteContenedoresService;
 
 @RestController
@@ -42,7 +42,7 @@ import com.geasp.micro.mercancias.services.ParteContenedoresService;
 public class ContenedoresController implements IMercanciaControllers<ContenedorResponse, ContenedorRequest> {
 	
 	@Autowired
-	private IMercanciaService<ContenedorResponse, ContenedorRequest> service;
+	private ContenedorService service;
 
 	@Autowired
 	private ParteContenedoresService parte;
@@ -93,8 +93,26 @@ public class ContenedoresController implements IMercanciaControllers<ContenedorR
 	public ResponseEntity<List<CantidadEmpresa>> getResumenPorDevolver(){
 		return ResponseEntity.ok(parte.listarContenedoresDevolver());
 	}
+	
 	@GetMapping(value = "/pendientes")
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendietnes(){
 		return ResponseEntity.ok(parte.listarPendientes());
+	}
+
+	@Override
+	@PostMapping(value = "/extraer/{id}")
+	public ResponseEntity<ContenedorResponse> extraerById(@PathVariable("id") Long id) {
+		return ResponseEntity.ok(service.extractById(id));
+	}
+
+	@Override
+	@PostMapping(value = "/revertir/{id}")
+	public ResponseEntity<ContenedorResponse> revertirById(@PathVariable("id") Long id) {
+		return ResponseEntity.ok(service.revertById(id));
+	}
+	
+	@PostMapping(value = "/devolver/{id}")
+	public ResponseEntity<ContenedorResponse> devolverById(@PathVariable("id") Long id) {
+		return ResponseEntity.ok(service.devolverById(id));
 	}
 }

@@ -16,4 +16,6 @@ public interface IMercanciaService<T,R> {
 	public T updateById(R request, Long id);
 	public T desactivateById(Long id);
 	public T viewById(Long id);
+	public T extractById(Long id);
+	public T revertById(Long id);
 }

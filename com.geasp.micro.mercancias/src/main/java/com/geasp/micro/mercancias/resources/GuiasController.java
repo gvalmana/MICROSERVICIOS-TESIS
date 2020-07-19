@@ -89,4 +89,18 @@ public class GuiasController implements IMercanciaControllers<GuiaResponse, Guia
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendietnes(){
 		return ResponseEntity.ok(parte.listarPendientes());
 	}
+
+	@Override
+	@PostMapping(value = "/extraer/{id}")
+	public ResponseEntity<GuiaResponse> extraerById(@PathVariable("id") Long id) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.extractById(id));
+	}
+
+	@Override
+	@PostMapping(value = "/revertir/{id}")
+	public ResponseEntity<GuiaResponse> revertirById(@PathVariable("id") Long id) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.revertById(id));
+	}
 }

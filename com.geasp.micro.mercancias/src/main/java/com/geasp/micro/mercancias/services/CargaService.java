@@ -179,4 +179,40 @@ public class CargaService implements IMercanciaService<CargaResponse, CargaReque
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
+
+	@Override
+	public CargaResponse extractById(Long id) {
+		try {
+			Optional<Carga> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				return crearRespuesta(optional,EstadoMercancias.EXTRAIDA);
+			} else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La carga a extraer no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public CargaResponse revertById(Long id) {
+		try {
+			Optional<Carga> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				return crearRespuesta(optional,EstadoMercancias.LISTO_PARA_EXTRAER);
+			} else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La carga a revertir no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+	private CargaResponse crearRespuesta(Optional<Carga> optional, EstadoMercancias estado) {
+		Carga mercancia = optional.get();
+		mercancia.setEstado(estado);
+		dao.saveAndFlush(mercancia);
+		CargaResponse response = mapper.map(mercancia, CargaResponse.class);
+		mappearDatos(mercancia, response);
+		return response;
+	}
 }
