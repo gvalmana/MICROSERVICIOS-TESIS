@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.mercancias.conf.Calculos;
 import com.geasp.micro.mercancias.models.CantidadEmpresa;
@@ -32,6 +33,8 @@ import com.geasp.micro.mercancias.responses.ResumenPendientes;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
+import reactor.core.publisher.Mono;
+
 @Service
 @RefreshScope
 public class ParteContenedoresService implements IParteService<ResumenContenedores> {
@@ -41,6 +44,9 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;
+	
+	@Autowired
+	private WebClient.Builder webClientBuilder;	
 	
 	@Value("${partes.contenedores.nombre}")
 	private String contenedoresNombre;
@@ -65,13 +71,13 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 	}
 	
 	@Override
-	@HystrixCommand(fallbackMethod = "makePartefallback", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-		//	@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-		})
+//	@HystrixCommand(fallbackMethod = "makePartefallback", commandProperties = {
+//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
+//		//	@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//		})
 	public ResumenContenedores makeParte(LocalDate date) {
 		ResumenContenedores res = new ResumenContenedores(contenedoresNombre);
 		List<Contenedor> paraExtraer = dao.findByEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
@@ -165,7 +171,7 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 	}
 	
 	private List<CantidadEmpresa> listarPorEmpresas(List<Contenedor> data){
-		List<Cliente> clientes = buscarTodasLasEmpresas();
+		List<Cliente> clientes = buscarTodasLasEmpresas().block();
 		List<CantidadEmpresa> resultado = new ArrayList<CantidadEmpresa>();
 		//RECORRE TODA LA LISTA DE CLIENTES
 		clientes.stream().forEach(index -> {
@@ -183,22 +189,17 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 		});		
 		return resultado;
 	}
-
-	private List<Cliente> buscarTodasLasEmpresas() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		List<Cliente> clientes = restTemplate.exchange(
-				"http://EMPRESAS/v1/clientes/", 
-				HttpMethod.GET,
-				entity,
-				new ParameterizedTypeReference<List<Cliente>>() {
-				}
-			).getBody();
-		return clientes;
-	}
+	
+	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
+		return webClientBuilder.build().get()
+				.uri("http://EMPRESAS/v1/clientes/")
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<List<Cliente>>() {});
+	}	
 	
 	public List<CantidadEmpresa> listarContenedoresDevolver(){
 		List<Contenedor> lista = dao.findByEstado(EstadoMercancias.EXTRAIDA);
@@ -208,7 +209,7 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 	
 	public List<ResumenPendientes> listarPendientes(){
 		List<ResumenPendientes> res = new ArrayList<ResumenPendientes>();
-		List<Cliente> clientes = buscarTodasLasEmpresas();
+		List<Cliente> clientes = buscarTodasLasEmpresas().block();
 		List<Contenedor> contenedores = dao.findByEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
 
 		clientes.stream().forEach(index->{

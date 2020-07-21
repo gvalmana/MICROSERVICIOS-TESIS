@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 //import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -36,6 +37,8 @@ import com.geasp.micro.operaciones.responses.ExtraccionResponse;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
+import reactor.core.publisher.Mono;
+
 @Service
 public class DevolucionesService implements IOperacionesService<DevolucionResponse, OperacionRequest> {
 	
@@ -52,89 +55,97 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 	private RestTemplate restTemplate;
 	
 	@Autowired
+	private WebClient.Builder webClientBuilder;
+	
+	@Autowired
 	private Mapper mapper;
 
-	private ResponseEntity<Mercancia> get(Long id) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/operaciones/"+id, 
-				HttpMethod.GET,
-				entity,
-				Mercancia.class
-			);
-	}
+//	private ResponseEntity<Mercancia> get(Long id) {
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//		headers.setBearerAuth(securityContext.getTokenString());
+//		
+//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
+//		
+//		return restTemplate.exchange(
+//				"http://MERCANCIAS/operaciones/"+id, 
+//				HttpMethod.GET,
+//				entity,
+//				Mercancia.class
+//			);
+//	}
 
-//	private Mono<Mercancia> getMercancia(Extraccion extraccion) {
-//		return webClientBuilder.build().get()
-//				.uri("http://MICROSERVICIO-MERCANCIAS/mercancias/"+extraccion.getMercanciaId())
-//				.headers(header->header.setBearerAuth(securityContext.getTokenString()))
-//				.retrieve()
-//				.bodyToMono(Mercancia.class)
-//				.transform(it -> cbFactory.create("slow").run(it, throwable -> Mono.just(new Mercancia())));
+	private Mono<Mercancia> get(Long id) {
+		return webClientBuilder.build().get()
+				.uri("http://MERCANCIAS/operaciones/"+id)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(Mercancia.class);
+	}
+	
+//	private ResponseEntity<Mercancia> devolver(Long id){
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//		headers.setBearerAuth(securityContext.getTokenString());
+//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
+//		
+//		return restTemplate.exchange(
+//				"http://MERCANCIAS/operaciones/devolver/"+id, 
+//				HttpMethod.POST, 
+//				entity, 
+//				Mercancia.class
+//			);
 //	}
 	
-	private ResponseEntity<Mercancia> devolver(Long id){
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/operaciones/devolver/"+id, 
-				HttpMethod.POST, 
-				entity, 
-				Mercancia.class
-			);
+	private Mono<Mercancia> devolver(Long id) {
+		return webClientBuilder.build()
+				.post()
+				.uri("http://MERCANCIAS/operaciones/devolver/"+id)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(Mercancia.class);
 	}	
-//	private Mercancia postExtraer(Extraccion extraccion) {
-//		Mercancia mercancia = webClientBuilder.build()
-//				.post()
-//				.uri("http://MICROSERVICIO-MERCANCIAS/mercancias/devolver/"+extraccion.getMercanciaId())
-//				.headers(header->header.setBearerAuth(securityContext.getTokenString()))
-//				.retrieve()
-//				.bodyToMono(Mercancia.class)
-//				.block();
-//		return mercancia;
-//	}	
 
-	private ResponseEntity<Mercancia> revertir(Long id){
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/operaciones/revertir/"+id, 
-				HttpMethod.POST, 
-				entity, 
-				Mercancia.class
-			);
-	}
+//	private ResponseEntity<Mercancia> revertir(Long id){
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//		headers.setBearerAuth(securityContext.getTokenString());
+//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
+//		
+//		return restTemplate.exchange(
+//				"http://MERCANCIAS/operaciones/revertir/"+id, 
+//				HttpMethod.POST, 
+//				entity, 
+//				Mercancia.class
+//			);
+//	}
 	
-//	private Mercancia postRevert(Extraccion extraccion) {
-//		Mercancia mercancia = webClientBuilder.build()
-//				.post()
-//				.uri("http://MICROSERVICIO-MERCANCIAS/mercancias/revertir/"+extraccion.getMercanciaId())
-//				.headers(header->header.setBearerAuth(securityContext.getTokenString()))
-//				.retrieve()
-//				.bodyToMono(Mercancia.class)
-//				.block();
-//		return mercancia;
-//	}	
+	private Mono<Mercancia> revertir(Long id) {
+		return webClientBuilder.build()
+				.post()
+				.uri("http://MERCANCIAS/operaciones/revertir/"+id)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(Mercancia.class);
+	}	
 	
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackCreate", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})	
+//	@HystrixCommand(fallbackMethod = "getFallbackCreate", commandProperties = {
+//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
+////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//	})	
 	public DevolucionResponse registrar(OperacionRequest entity, Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);			
@@ -144,7 +155,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 				devolucion.setExtraccion(extraccion);
 				devoluciones.saveAndFlush(devolucion);
 				
-				Mercancia mercancia = devolver(extraccion.getMercanciaId()).getBody();
+				Mercancia mercancia = devolver(extraccion.getMercanciaId()).block();
 				
 				ExtraccionResponse resExtraccion = mapper.map(extraccion, ExtraccionResponse.class);
 				resExtraccion.setMercancia(mercancia);
@@ -160,26 +171,26 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
-	@SuppressWarnings("unused")
-	private DevolucionResponse getFallbackCreate(OperacionRequest request, Long id){
-		return new DevolucionResponse("Ha ocurrido al registrar la operación.");
-	}	
+//	@SuppressWarnings("unused")
+//	private DevolucionResponse getFallbackCreate(OperacionRequest request, Long id){
+//		return new DevolucionResponse("Ha ocurrido al registrar la operación.");
+//	}	
 
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackListar", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})
+//	@HystrixCommand(fallbackMethod = "getFallbackListar", commandProperties = {
+//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
+////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//	})
 	public List<DevolucionResponse> listar() {
 		try {
 			List<DevolucionResponse> response = new ArrayList<DevolucionResponse>();
 			List<Devolucion> lista = devoluciones.findAll();
 			lista.stream().forEach(index -> {
 				Extraccion extraccion = index.getExtraccion();
-				Mercancia mercancia = get(extraccion.getMercanciaId()).getBody();
+				Mercancia mercancia = get(extraccion.getMercanciaId()).block();
 				ExtraccionResponse data = mapper.map(extraccion, ExtraccionResponse.class);
 				data.setMercancia(mercancia);
 				DevolucionResponse item = mapper.map(index, DevolucionResponse.class);
@@ -198,13 +209,13 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 	}	
 
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})
+//	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
+//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
+////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//	})
 	public DevolucionResponse viewById(Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);
@@ -212,7 +223,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			if (optionalDevolucion.isPresent() && optionalExtraccion.isPresent()) {
 				Devolucion devolucion = optionalDevolucion.get();
 				Extraccion extraccion = devolucion.getExtraccion();
-				Mercancia mercancia = get(extraccion.getMercanciaId()).getBody();
+				Mercancia mercancia = get(extraccion.getMercanciaId()).block();
 				ExtraccionResponse data = mapper.map(extraccion, ExtraccionResponse.class);	
 				data.setMercancia(mercancia);
 				DevolucionResponse res = mapper.map(devolucion, DevolucionResponse.class);
@@ -225,19 +236,19 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
-	@SuppressWarnings("unused")
-	private DevolucionResponse getFallbackView(Long id){
-		return new DevolucionResponse("Error al obtener la operación solicitada, inténtelo mas tarde.");
-	}	
+//	@SuppressWarnings("unused")
+//	private DevolucionResponse getFallbackView(Long id){
+//		return new DevolucionResponse("Error al obtener la operación solicitada, inténtelo mas tarde.");
+//	}	
 
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackUpdate", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})	
+//	@HystrixCommand(fallbackMethod = "getFallbackUpdate", commandProperties = {
+//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
+////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//	})	
 	public DevolucionResponse updateById(OperacionRequest request, Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);
@@ -248,7 +259,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 				actualizada.setFecha(data.getFecha());				
 				devoluciones.saveAndFlush(actualizada);								
 				ExtraccionResponse extraccion = mapper.map(actualizada.getExtraccion(), ExtraccionResponse.class);
-				Mercancia mercancia = get(actualizada.getExtraccion().getMercanciaId()).getBody();			
+				Mercancia mercancia = get(actualizada.getExtraccion().getMercanciaId()).block();			
 				extraccion.setMercancia(mercancia);
 				DevolucionResponse res = mapper.map(actualizada, DevolucionResponse.class);				
 				res.setExtraccion(extraccion);
@@ -262,19 +273,19 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private DevolucionResponse getFallbackUpdate(OperacionRequest request, Long id){
-		return new DevolucionResponse("Ha ocurrido un error al actualizar.");
-	}
+//	@SuppressWarnings("unused")
+//	private DevolucionResponse getFallbackUpdate(OperacionRequest request, Long id){
+//		return new DevolucionResponse("Ha ocurrido un error al actualizar.");
+//	}
 	
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})		
+//	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
+//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
+////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//	})		
 	public DevolucionResponse deleteById(Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);
@@ -284,7 +295,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 				if (extraccion.isActivo()==false) {
 					ExtraccionResponse resExtraccion = mapper.map(extraccion, ExtraccionResponse.class);
 					DevolucionResponse res = mapper.map(optionalDevolucion.get(), DevolucionResponse.class);
-					Mercancia mercancia = revertir(extraccion.getMercanciaId()).getBody();				
+					Mercancia mercancia = revertir(extraccion.getMercanciaId()).block();				
 					resExtraccion.setMercancia(mercancia);
 					res.setExtraccion(resExtraccion);
 					res.setMessage("Operación revertida con éxito.");
@@ -303,7 +314,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 	}
 
 	private Boolean comprobar(Optional<Extraccion> optional) {
-		return get(optional.get().getMercanciaId()).getBody().getId()!=null;
+		return get(optional.get().getMercanciaId()).block().getId()!=null;
 	}
 
 	@Override

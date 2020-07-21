@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.operaciones.models.CantidadEmpresa;
 import com.geasp.micro.operaciones.models.Cliente;
@@ -29,6 +30,8 @@ import com.geasp.micro.operaciones.responses.ParteResponse;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
+import reactor.core.publisher.Mono;
+
 @Service
 public class ParteService implements IParteService{
 
@@ -37,6 +40,9 @@ public class ParteService implements IParteService{
 	
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;
@@ -50,37 +56,59 @@ public class ParteService implements IParteService{
 	@Value("${parte.error}")
 	private String error;
 	
-	private ResponseEntity<Mercancia> get(Long id) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());		
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/operaciones/"+id, 
-				HttpMethod.GET,
-				entity,
-				Mercancia.class
-			);
+//	private ResponseEntity<Mercancia> get(Long id) {
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//		headers.setBearerAuth(securityContext.getTokenString());		
+//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
+//		
+//		return restTemplate.exchange(
+//				"http://MERCANCIAS/operaciones/"+id, 
+//				HttpMethod.GET,
+//				entity,
+//				Mercancia.class
+//			);
+//	}
+	
+	private Mono<Mercancia> get(Long id) {
+		return webClientBuilder.build().get()
+				.uri("http://MERCANCIAS/operaciones/"+id)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(Mercancia.class);
 	}
 	
-	private ResponseEntity<List<Cliente>> buscarTodasLasEmpresas() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://EMPRESAS/v1/clientes/", 
-				HttpMethod.GET,
-				entity,
-				new ParameterizedTypeReference<List<Cliente>>() {
-				}
-			);
+//	private ResponseEntity<List<Cliente>> buscarTodasLasEmpresas() {
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//		headers.setBearerAuth(securityContext.getTokenString());
+//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
+//		
+//		return restTemplate.exchange(
+//				"http://EMPRESAS/v1/clientes/", 
+//				HttpMethod.GET,
+//				entity,
+//				new ParameterizedTypeReference<List<Cliente>>() {
+//				}
+//			);
+//	}
+	
+	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
+		return webClientBuilder.build().get()
+				.uri("http://EMPRESAS/v1/clientes/")
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<List<Cliente>>() {});
 	}
 	
 	private List<CantidadEmpresa> listarExtraccionesPorEmpresas(List<Extraccion> data){
-		List<Cliente> clientes = buscarTodasLasEmpresas().getBody();
+		List<Cliente> clientes = buscarTodasLasEmpresas().block();
 		List<CantidadEmpresa> resultado = new ArrayList<CantidadEmpresa>();
 		//RECORRE TODA LA LISTA DE CLIENTES
 		clientes.stream().forEach(index -> {
@@ -88,7 +116,7 @@ public class ParteService implements IParteService{
 			//RECORRE LA LISTA DE CONTENEDORES PARA EXTRAER
 			for (Extraccion item : data) {
 				//SI ES EL MISMO CLIENTE AGREGA UN CONTADOR
-				if (index.getNombre().equals(get(item.getMercanciaId()).getBody().getCliente())) {
+				if (index.getNombre().equals(get(item.getMercanciaId()).block().getCliente())) {
 					cantidad++;
 				}
 			}
@@ -149,13 +177,13 @@ public class ParteService implements IParteService{
 	}
 	
 	@Override
-	@HystrixCommand(fallbackMethod = "makeParteFallBack", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-		//	@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-		})	
+//	@HystrixCommand(fallbackMethod = "makeParteFallBack", commandProperties = {
+//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
+//		//	@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//		})	
 	public ParteResponse makeParte(String date) {
 		// TODO Auto-generated method stub
 		LocalDate fecha = LocalDate.parse(date);

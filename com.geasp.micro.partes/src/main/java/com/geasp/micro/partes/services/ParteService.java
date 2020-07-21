@@ -8,12 +8,9 @@ import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.partes.models.ResumenExtracciones;
 import com.geasp.micro.partes.models.Parte;
@@ -21,12 +18,14 @@ import com.geasp.micro.partes.models.ResumenCargas;
 import com.geasp.micro.partes.models.ResumenContenedores;
 import com.geasp.micro.partes.models.ResumenGuias;
 
+import reactor.core.publisher.Mono;
+
 @Service
 @RefreshScope
 public class ParteService implements IParte {
-
+	
 	@Autowired
-	private RestTemplate restTemplate;
+	private WebClient.Builder webClientBuilder;
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;
@@ -43,15 +42,15 @@ public class ParteService implements IParte {
 		
 		String url = "http://OPERACIONES/partes/fecha="+date;
 		
-		ResumenExtracciones extracciones = getOperaciones(url);
+		ResumenExtracciones extracciones = getOperaciones(url).block();
 		
-		ResumenContenedores contenedores = getResumenContenedores(fecha);
+		ResumenContenedores contenedores = getResumenContenedores(fecha).block();
 		contenedores.setResumenSalidas(extracciones.getContenedores());
 		
-		ResumenCargas cargas =  getResumenCargas(fecha);
+		ResumenCargas cargas =  getResumenCargas(fecha).block();
 		cargas.setResumenSalidas(extracciones.getCargas());
 		
-		ResumenGuias guias = getResumenGuias(fecha);
+		ResumenGuias guias = getResumenGuias(fecha).block();
 		guias.setResumenSalidas(extracciones.getGuias());
 		
 		res.setContenedores(contenedores);
@@ -61,65 +60,55 @@ public class ParteService implements IParte {
 		return res;
 	}
 	
-	@Override
-	public Parte parteFallCallBack(String date) {
-		LocalDate fecha = LocalDate.parse(date);
-		LocalTime hora = LocalTime.now();
-		Parte res = new Parte(fecha, hora, "Error en la confección del parte.");
-		return res;
+//	@Override
+//	public Parte parteFallCallBack(String date) {
+//		LocalDate fecha = LocalDate.parse(date);
+//		LocalTime hora = LocalTime.now();
+//		Parte res = new Parte(fecha, hora, "Error en la confección del parte.");
+//		return res;
+//	}
+	
+	private Mono<ResumenExtracciones> getOperaciones(String url) {
+		return webClientBuilder.build().get()
+				.uri(url)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(ResumenExtracciones.class);
 	}
 	
-	private ResumenExtracciones getOperaciones(String url) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				url, 
-				HttpMethod.GET,
-				entity,
-				ResumenExtracciones.class
-			).getBody();
+	private Mono<ResumenContenedores> getResumenContenedores(LocalDate data) {
+		return webClientBuilder.build().get()
+				.uri("http://MERCANCIAS/contenedores/parte/fecha="+data)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(ResumenContenedores.class);
 	}
 	
-	private ResumenContenedores getResumenContenedores(LocalDate data) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/contenedores/parte/fecha="+data, 
-				HttpMethod.GET,
-				entity,
-				ResumenContenedores.class
-			).getBody();
+	private Mono<ResumenCargas> getResumenCargas(LocalDate data) {
+		return webClientBuilder.build().get()
+				.uri("http://MERCANCIAS/cargas/parte/fecha="+data)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(ResumenCargas.class);
 	}
-	private ResumenCargas getResumenCargas(LocalDate data) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/cargas/parte/fecha="+data, 
-				HttpMethod.GET,
-				entity,
-				ResumenCargas.class
-			).getBody();		
-	}
-	private ResumenGuias getResumenGuias(LocalDate data) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/guias/parte/fecha="+data, 
-				HttpMethod.GET,
-				entity,
-				ResumenGuias.class
-			).getBody();		
+	
+	private Mono<ResumenGuias> getResumenGuias(LocalDate data) {
+		return webClientBuilder.build().get()
+				.uri("http://MERCANCIAS/guias/parte/fecha="+data)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(ResumenGuias.class);
 	}	
 }

@@ -7,15 +7,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.geasp.micro.operaciones.models.Extraccion;
@@ -23,8 +18,8 @@ import com.geasp.micro.operaciones.models.Mercancia;
 import com.geasp.micro.operaciones.repositories.ExtraccionRepository;
 import com.geasp.micro.operaciones.requests.OperacionRequest;
 import com.geasp.micro.operaciones.responses.ExtraccionResponse;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+
+import reactor.core.publisher.Mono;
 
 import org.dozer.Mapper;
 import org.keycloak.KeycloakSecurityContext;
@@ -38,64 +33,50 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 	private Mapper mapper;
 	
 	@Autowired
-	private RestTemplate restTemplate;
+	private WebClient.Builder webClientBuilder;	
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;
 	
-	private ResponseEntity<Mercancia> get(Long id) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		return restTemplate.exchange(
-				"http://MERCANCIAS/operaciones/"+id, 
-				HttpMethod.GET,
-				entity,
-				Mercancia.class
-			);
+	private Mono<Mercancia> get(Long id) {
+		return webClientBuilder.build().get()
+				.uri("http://MERCANCIAS/operaciones/"+id)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(Mercancia.class);
+	}	
+	
+	private Mono<Mercancia> extract(Long id) {
+		return webClientBuilder.build()
+				.post()
+				.uri("http://MERCANCIAS/operaciones/extraer/"+id)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(Mercancia.class);
 	}
 	
-	private ResponseEntity<Mercancia> extract(Long id){
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/operaciones/extraer/"+id, 
-				HttpMethod.POST, 
-				entity, 
-				Mercancia.class
-			);
-	}
+	private Mono<Mercancia> revertir(Long id) {
+		return webClientBuilder.build()
+				.post()
+				.uri("http://MERCANCIAS/operaciones/revertir/"+id)
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(Mercancia.class);
+	}	
 	
-	private ResponseEntity<Mercancia> revert(Extraccion extraccion){
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-		headers.setBearerAuth(securityContext.getTokenString());
-		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-		
-		return restTemplate.exchange(
-				"http://MERCANCIAS/operaciones/revertir/"+extraccion.getMercanciaId(), 
-				HttpMethod.POST, 
-				entity, 
-				Mercancia.class
-			);
-	}
-	
-	@HystrixCommand(fallbackMethod = "getFallbackCreate", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})
 	@Override
 	public ExtraccionResponse registrar(OperacionRequest entity, Long id) {
 		try {
-			Mercancia mercancia = extract(id).getBody();
+			Mercancia mercancia = extract(id).block();
 			if (mercancia.getId()==id) {
 				Extraccion extraccion = mapper.map(entity, Extraccion.class);
 				extraccion.setMercanciaId(mercancia.getId());
@@ -113,24 +94,12 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 		}
 	}
 	
-	@SuppressWarnings("unused")
-	private ExtraccionResponse getFallbackCreate(OperacionRequest request, Long id){
-		return new ExtraccionResponse("Ha ocurrido al registrar la operación.");
-	}	
-	
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})
 	public ExtraccionResponse viewById(Long id) {
 		try {
 			if (extracciones.findByMercanciaId(id).isPresent()) {
 				Extraccion extraccion = extracciones.findByMercanciaId(id).get();
-				Mercancia mercancia = get(extraccion.getMercanciaId()).getBody();
+				Mercancia mercancia = get(extraccion.getMercanciaId()).block();
 				ExtraccionResponse res = mapper.map(extraccion, ExtraccionResponse.class);
 				res.setMercancia(mercancia);
 				return res;
@@ -149,20 +118,13 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 	}
 	
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackListar", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})	
 	public List<ExtraccionResponse> listar() {
 		try {				
 			List<ExtraccionResponse> response = new ArrayList<ExtraccionResponse>();
 			List<Extraccion> lista = extracciones.findAll();
 			
 			lista.stream().forEach(index-> {
-				Mercancia mercancia = get(index.getMercanciaId()).getBody();
+				Mercancia mercancia = get(index.getMercanciaId()).block();
 				ExtraccionResponse item = mapper.map(index, ExtraccionResponse.class);
 				item.setMercancia(mercancia);
 				response.add(item);
@@ -180,13 +142,6 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 	}
 	
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackUpdate", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})	
 	public ExtraccionResponse updateById(OperacionRequest request, Long id) {
 		try {
 			Optional<Extraccion> extraccionOptional= extracciones.findByMercanciaId(id);
@@ -196,7 +151,7 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 				extraccionActualizada.setFecha(data.getFecha());				
 				extracciones.saveAndFlush(extraccionActualizada);
 				ExtraccionResponse res = mapper.map(extraccionActualizada, ExtraccionResponse.class);
-				Mercancia mercancia = get(extraccionActualizada.getMercanciaId()).getBody();
+				Mercancia mercancia = get(extraccionActualizada.getMercanciaId()).block();
 				res.setMessage("Operación actualizada con éxito.");
 				res.setMercancia(mercancia);
 				return res;
@@ -207,27 +162,15 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
-
-	@SuppressWarnings("unused")
-	private ExtraccionResponse getFallbackUpdate(OperacionRequest request, Long id){
-		return new ExtraccionResponse("Ha ocurrido un error al actualizar.");
-	}	
 	
-	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})	
+	@Override	
 	public ExtraccionResponse deleteById(Long id) {
 		try {
 			Optional<Extraccion> extraccionOptional= extracciones.findByMercanciaId(id);			
 			if (extraccionOptional.isPresent() && comprobar(extraccionOptional)) {
 				Extraccion extraccion = extraccionOptional.get();
 				if (extraccionOptional.get().isActivo()==false) {
-					Mercancia mercancia = revert(extraccion).getBody();
+					Mercancia mercancia = revertir(extraccion.getMercanciaId()).block();
 					ExtraccionResponse res = mapper.map(extraccion, ExtraccionResponse.class);
 					res.setMercancia(mercancia);
 					res.setMessage("Operación revertida con éxito.");
@@ -245,17 +188,10 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 	}
 	
 	private Boolean comprobar(Optional<Extraccion> extraccionOptional) {
-		return get(extraccionOptional.get().getMercanciaId()).getBody().getId()!=null;
+		return get(extraccionOptional.get().getMercanciaId()).block().getId()!=null;
 	}
 
 	@Override
-	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
-			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-	})	
 	public ExtraccionResponse activateById(Long id) {
 		try {
 			Optional<Extraccion> extraccionOptional= extracciones.findByMercanciaId(id);
@@ -264,7 +200,7 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 				extraccion.setActivo(!extraccion.isActivo());				
 				extracciones.saveAndFlush(extraccion);
 				ExtraccionResponse res = mapper.map(extraccion, ExtraccionResponse.class);
-				Mercancia mercancia = get(extraccion.getMercanciaId()).getBody();
+				Mercancia mercancia = get(extraccion.getMercanciaId()).block();
 				res.setMessage("Operación actualizada con éxito.");
 				res.setMercancia(mercancia);
 				return res;
