@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.mercancias.conf.Calculos;
@@ -26,22 +25,13 @@ import com.geasp.micro.mercancias.models.PendientesAlistar;
 import com.geasp.micro.mercancias.repositories.GuiaRepository;
 import com.geasp.micro.mercancias.responses.ResumenGuias;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 import reactor.core.publisher.Mono;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
 @Service
 @RefreshScope
 public class ParteGuiasService implements IParteService<ResumenGuias>{
-
-	@Autowired
-	private RestTemplate restTemplate;
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
@@ -67,17 +57,11 @@ public class ParteGuiasService implements IParteService<ResumenGuias>{
 	}
 	
 	@Override
-//	@HystrixCommand(fallbackMethod = "makePartefallback", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//		//	@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//		})	
 	public ResumenGuias makeParte(LocalDate date) {
 		// TODO Auto-generated method stub
 		ResumenGuias res = new ResumenGuias(guiasNombre);
 		List<Guia> paraExtraer = dao.findByEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
+		
 		List<Guia> listaEstadia = new ArrayList<Guia>();
 		List<Guia> porHabilitar = new ArrayList<Guia>();
 		List<Guia> porEntregar = new ArrayList<Guia>();
@@ -102,9 +86,10 @@ public class ParteGuiasService implements IParteService<ResumenGuias>{
 		List<CantidadEmpresa> resumenOperaciones = listarPorEmpresas(listaEntradas);
 		
 		Estadia enEstadia = new Estadia();
+		
 		enEstadia.setPorHabilitar(porHabilitar.size());
 		enEstadia.setOtrasCausas(porEntregar.size());
-		enEstadia.setPorExtraccion(paraExtraer.size()-porHabilitar.size()-porEntregar.size());
+		enEstadia.setPorExtraccion(listaEstadia.size()-porHabilitar.size()-porEntregar.size());
 		enEstadia.setListado(ListaenEstadia);
 		
 		res.setTotal(paraExtraer.size());
@@ -113,6 +98,7 @@ public class ParteGuiasService implements IParteService<ResumenGuias>{
 		res.setPendientesHabilitar(porHabilitar.size());
 		res.setGuiasHabilitadas(paraExtraer.size()-porHabilitar.size());
 		res.setResumenEntradas(new Operaciones(resumenOperaciones, titulo));
+		
 		res.setPendientesAlistar(
 				new PendientesAlistar(
 						listarPorEmpresas(porHabilitar), 

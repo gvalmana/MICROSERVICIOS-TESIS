@@ -10,13 +10,8 @@ import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.operaciones.models.CantidadEmpresa;
@@ -27,9 +22,6 @@ import com.geasp.micro.operaciones.models.Operaciones;
 import com.geasp.micro.operaciones.repositories.ExtraccionRepository;
 import com.geasp.micro.operaciones.responses.ParteResponse;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
-
 import reactor.core.publisher.Mono;
 
 @Service
@@ -37,9 +29,6 @@ public class ParteService implements IParteService{
 
 	@Autowired
 	private ExtraccionRepository extracciones;
-	
-	@Autowired
-	private RestTemplate restTemplate;
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
@@ -56,20 +45,6 @@ public class ParteService implements IParteService{
 	@Value("${parte.error}")
 	private String error;
 	
-//	private ResponseEntity<Mercancia> get(Long id) {
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//		headers.setBearerAuth(securityContext.getTokenString());		
-//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-//		
-//		return restTemplate.exchange(
-//				"http://MERCANCIAS/operaciones/"+id, 
-//				HttpMethod.GET,
-//				entity,
-//				Mercancia.class
-//			);
-//	}
-	
 	private Mono<Mercancia> get(Long id) {
 		return webClientBuilder.build().get()
 				.uri("http://MERCANCIAS/operaciones/"+id)
@@ -80,21 +55,6 @@ public class ParteService implements IParteService{
 				.retrieve()
 				.bodyToMono(Mercancia.class);
 	}
-	
-//	private ResponseEntity<List<Cliente>> buscarTodasLasEmpresas() {
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//		headers.setBearerAuth(securityContext.getTokenString());
-//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-//		
-//		return restTemplate.exchange(
-//				"http://EMPRESAS/v1/clientes/", 
-//				HttpMethod.GET,
-//				entity,
-//				new ParameterizedTypeReference<List<Cliente>>() {
-//				}
-//			);
-//	}
 	
 	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
 		return webClientBuilder.build().get()
@@ -176,14 +136,7 @@ public class ParteService implements IParteService{
 		return new ParteResponse(contenedores, cargas, guias);
 	}
 	
-	@Override
-//	@HystrixCommand(fallbackMethod = "makeParteFallBack", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//		//	@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//		})	
+	@Override	
 	public ParteResponse makeParte(String date) {
 		// TODO Auto-generated method stub
 		LocalDate fecha = LocalDate.parse(date);

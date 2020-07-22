@@ -11,12 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.mercancias.conf.Calculos;
@@ -30,8 +26,6 @@ import com.geasp.micro.mercancias.models.PendientesAlistar;
 import com.geasp.micro.mercancias.repositories.ContenedorRepository;
 import com.geasp.micro.mercancias.responses.ResumenContenedores;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 import reactor.core.publisher.Mono;
 
@@ -39,8 +33,6 @@ import reactor.core.publisher.Mono;
 @RefreshScope
 public class ParteContenedoresService implements IParteService<ResumenContenedores> {
 
-	@Autowired
-	private RestTemplate restTemplate;
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;
@@ -143,11 +135,14 @@ public class ParteContenedoresService implements IParteService<ResumenContenedor
 				0);
 		
 		enEstadia.setListado(listarPorEmpresas(listaEstadia));
+		
 		enRiesgo.setListado(listarPorEmpresas(listaRiesgo));
 		
 		res.setTotal(paraExtraer.size()+paraDevolver.size());
+		
 		res.setCantidadParaExtraer(paraExtraer.size());
 		res.setCantidadParaDevolver(paraDevolver.size());
+		
 		res.setEnEstadia(enEstadia);
 		res.setEnRiesgo(enRiesgo);
 		res.setListosParaExtraer(listosParaExtraer);

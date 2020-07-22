@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.mercancias.conf.Calculos;
@@ -26,22 +25,13 @@ import com.geasp.micro.mercancias.models.PendientesAlistar;
 import com.geasp.micro.mercancias.repositories.CargaRepository;
 import com.geasp.micro.mercancias.responses.ResumenCargas;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
-
 import reactor.core.publisher.Mono;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
 @Service
 @RefreshScope
 public class ParteCargasService implements IParteService<ResumenCargas>{
-
-	@Autowired
-	private RestTemplate restTemplate;
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;

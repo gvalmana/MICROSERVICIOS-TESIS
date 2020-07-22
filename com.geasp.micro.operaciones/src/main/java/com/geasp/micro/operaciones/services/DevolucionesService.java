@@ -9,17 +9,10 @@ import java.util.stream.Collectors;
 import org.dozer.Mapper;
 import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-//import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.geasp.micro.operaciones.models.Devolucion;
@@ -30,13 +23,6 @@ import com.geasp.micro.operaciones.repositories.ExtraccionRepository;
 import com.geasp.micro.operaciones.requests.OperacionRequest;
 import com.geasp.micro.operaciones.responses.DevolucionResponse;
 import com.geasp.micro.operaciones.responses.ExtraccionResponse;
-//import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-//import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
-//
-//import reactor.core.publisher.Mono;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
-
 import reactor.core.publisher.Mono;
 
 @Service
@@ -52,28 +38,10 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 	private KeycloakSecurityContext securityContext;
 	
 	@Autowired
-	private RestTemplate restTemplate;
-	
-	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
 	@Autowired
 	private Mapper mapper;
-
-//	private ResponseEntity<Mercancia> get(Long id) {
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//		headers.setBearerAuth(securityContext.getTokenString());
-//		
-//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-//		
-//		return restTemplate.exchange(
-//				"http://MERCANCIAS/operaciones/"+id, 
-//				HttpMethod.GET,
-//				entity,
-//				Mercancia.class
-//			);
-//	}
 
 	private Mono<Mercancia> get(Long id) {
 		return webClientBuilder.build().get()
@@ -86,20 +54,6 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 				.bodyToMono(Mercancia.class);
 	}
 	
-//	private ResponseEntity<Mercancia> devolver(Long id){
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//		headers.setBearerAuth(securityContext.getTokenString());
-//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-//		
-//		return restTemplate.exchange(
-//				"http://MERCANCIAS/operaciones/devolver/"+id, 
-//				HttpMethod.POST, 
-//				entity, 
-//				Mercancia.class
-//			);
-//	}
-	
 	private Mono<Mercancia> devolver(Long id) {
 		return webClientBuilder.build()
 				.post()
@@ -110,21 +64,7 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 				})
 				.retrieve()
 				.bodyToMono(Mercancia.class);
-	}	
-
-//	private ResponseEntity<Mercancia> revertir(Long id){
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//		headers.setBearerAuth(securityContext.getTokenString());
-//		HttpEntity<String> entity = new HttpEntity<>("body",headers);
-//		
-//		return restTemplate.exchange(
-//				"http://MERCANCIAS/operaciones/revertir/"+id, 
-//				HttpMethod.POST, 
-//				entity, 
-//				Mercancia.class
-//			);
-//	}
+	}
 	
 	private Mono<Mercancia> revertir(Long id) {
 		return webClientBuilder.build()
@@ -139,13 +79,6 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 	}	
 	
 	@Override
-//	@HystrixCommand(fallbackMethod = "getFallbackCreate", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//	})	
 	public DevolucionResponse registrar(OperacionRequest entity, Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);			
@@ -171,19 +104,8 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
-//	@SuppressWarnings("unused")
-//	private DevolucionResponse getFallbackCreate(OperacionRequest request, Long id){
-//		return new DevolucionResponse("Ha ocurrido al registrar la operación.");
-//	}	
 
 	@Override
-//	@HystrixCommand(fallbackMethod = "getFallbackListar", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//	})
 	public List<DevolucionResponse> listar() {
 		try {
 			List<DevolucionResponse> response = new ArrayList<DevolucionResponse>();
@@ -209,13 +131,6 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 	}	
 
 	@Override
-//	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//	})
 	public DevolucionResponse viewById(Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);
@@ -236,19 +151,8 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
-//	@SuppressWarnings("unused")
-//	private DevolucionResponse getFallbackView(Long id){
-//		return new DevolucionResponse("Error al obtener la operación solicitada, inténtelo mas tarde.");
-//	}	
 
-	@Override
-//	@HystrixCommand(fallbackMethod = "getFallbackUpdate", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//	})	
+	@Override	
 	public DevolucionResponse updateById(OperacionRequest request, Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);
@@ -272,20 +176,8 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
-
-//	@SuppressWarnings("unused")
-//	private DevolucionResponse getFallbackUpdate(OperacionRequest request, Long id){
-//		return new DevolucionResponse("Ha ocurrido un error al actualizar.");
-//	}
 	
-	@Override
-//	@HystrixCommand(fallbackMethod = "getFallbackView", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-////			@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//	})		
+	@Override	
 	public DevolucionResponse deleteById(Long id) {
 		try {
 			Optional<Extraccion> optionalExtraccion = daoExtracciones.findByMercanciaId(id);
