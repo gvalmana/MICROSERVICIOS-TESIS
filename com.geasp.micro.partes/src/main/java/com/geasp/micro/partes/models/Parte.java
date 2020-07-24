@@ -29,6 +29,9 @@ public class Parte implements Serializable{
 	public Parte(String titulo) {
 		super();
 		this.titulo = titulo;
+		this.contenedores = new ResumenContenedores();
+		this.cargas = new ResumenCargas();
+		this.guias = new ResumenGuias();		
 	}
 
 	public Parte(LocalDate fecha, LocalTime hora_cierre, String titulo) {

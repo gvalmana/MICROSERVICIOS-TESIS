@@ -17,8 +17,6 @@ import com.geasp.micro.mercancias.conf.Calculos;
 
 @SpringBootApplication
 @EnableEurekaClient
-@RefreshScope
-@EnableCircuitBreaker
 @EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class)
 public class MercanciasApplication {
 

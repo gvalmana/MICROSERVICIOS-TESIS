@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
 @EnableEurekaClient
-@EnableCircuitBreaker
 public class OperacionesApplication {
 
 	@Bean

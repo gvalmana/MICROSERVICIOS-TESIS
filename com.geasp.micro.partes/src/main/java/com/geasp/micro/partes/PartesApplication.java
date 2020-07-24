@@ -8,11 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 
 @EnableEurekaClient
 @SpringBootApplication
-@EnableCircuitBreaker
 public class PartesApplication {
 
 	@Bean

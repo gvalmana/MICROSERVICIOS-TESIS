@@ -21,6 +21,8 @@ import com.geasp.micro.operaciones.requests.OperacionRequest;
 import com.geasp.micro.operaciones.responses.ExtraccionResponse;
 import com.geasp.micro.operaciones.services.IOperacionesService;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @RestController
 @RequestMapping(value = "/extraccion")
 @CrossOrigin(
@@ -37,39 +39,51 @@ import com.geasp.micro.operaciones.services.IOperacionesService;
 public class ExtraccionesController implements IControllers<ExtraccionResponse,OperacionRequest> {
 
 	@Autowired
-	IOperacionesService<ExtraccionResponse, OperacionRequest> service;
+	private IOperacionesService<ExtraccionResponse, OperacionRequest> service;
 	
+	private static final String MAIN_SERVICE = "mainService";
 	@Override
 	@PostMapping(value = "/{id}")
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
 	public ResponseEntity<ExtraccionResponse> Save(@RequestBody @Valid OperacionRequest entity, @PathVariable("id") Long id) {
+		//TODO hacer el callback
 		return ResponseEntity.ok(service.registrar(entity, id));
 	}
 
 	@Override
 	@GetMapping
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
 	public ResponseEntity<List<ExtraccionResponse>> getAll() {
+		//TODO hacer el callback
 		return ResponseEntity.ok(service.listar());
 	}
 
 	@Override
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<ExtraccionResponse> getById(@PathVariable("id") Long id) {
+		//TODO hacer el callback
 		return ResponseEntity.ok(service.viewById(id));
 	}
 
 	@Override
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<ExtraccionResponse> updateById(@RequestBody @Valid OperacionRequest data, @PathVariable("id")  Long id) {
+		//TODO hacer el callback
 		return ResponseEntity.ok(service.updateById(data, id));
 	}
 
 	@Override
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<ExtraccionResponse> revertById(@PathVariable("id") Long id) {
+		//TODO hacer el callback
 		return ResponseEntity.ok(service.deleteById(id));
 	}
 
 	@Override
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
 	@PostMapping(value = "activate/{id}")
 	public ResponseEntity<ExtraccionResponse> activateById(@PathVariable("id") Long id) {
 		// TODO Auto-generated method stub

@@ -60,14 +60,6 @@ public class ParteService implements IParte {
 		return res;
 	}
 	
-//	@Override
-//	public Parte parteFallCallBack(String date) {
-//		LocalDate fecha = LocalDate.parse(date);
-//		LocalTime hora = LocalTime.now();
-//		Parte res = new Parte(fecha, hora, "Error en la confección del parte.");
-//		return res;
-//	}
-	
 	private Mono<ResumenExtracciones> getOperaciones(String url) {
 		return webClientBuilder.build().get()
 				.uri(url)
