@@ -1,6 +1,7 @@
 package com.geasp.micro.partes.resources;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,7 +42,9 @@ public class ParteController {
 		return ResponseEntity.ok(servicio.getParteByDate(fecha));
 	}
 	
-	public ResponseEntity<Parte> parteFallback(String date, Exception e) {	
-		return new ResponseEntity<Parte>(new Parte("Error en la confección del parte"), HttpStatus.INTERNAL_SERVER_ERROR);
+	public ResponseEntity<Parte> parteFallback(String date, Exception e) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
+		return new ResponseEntity<Parte>(new Parte(), headers,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

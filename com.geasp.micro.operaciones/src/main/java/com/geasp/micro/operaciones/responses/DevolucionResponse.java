@@ -14,7 +14,6 @@ public class DevolucionResponse implements Serializable {
 	
 	private Long id;
 	
-	private String message;
 	private boolean activo;
 	protected String createdBy;
     protected String lastModifiedBy;	
@@ -39,7 +38,6 @@ public class DevolucionResponse implements Serializable {
 	public DevolucionResponse(String message) {
 		super();
 		this.activo = false;
-		this.message = message;
 		this.extraccion = new ExtraccionResponse();
 	}
 
@@ -49,14 +47,6 @@ public class DevolucionResponse implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public boolean isActivo() {

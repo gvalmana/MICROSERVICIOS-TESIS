@@ -16,8 +16,6 @@ public class ExtraccionResponse implements Serializable {
 
 	private Long id;
 	
-	private String message;
-	
 	protected String createdBy;
     protected String lastModifiedBy;	
 	
@@ -42,7 +40,6 @@ public class ExtraccionResponse implements Serializable {
 	
 	public ExtraccionResponse(String mensaje) {
 		super();
-		this.message = mensaje;
 		this.mercancia = new Mercancia();
 	}
 
@@ -52,14 +49,6 @@ public class ExtraccionResponse implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public String getCreatedBy() {

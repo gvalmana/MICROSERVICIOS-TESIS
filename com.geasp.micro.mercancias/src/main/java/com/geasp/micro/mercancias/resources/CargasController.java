@@ -1,9 +1,12 @@
 package com.geasp.micro.mercancias.resources;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +25,8 @@ import com.geasp.micro.mercancias.responses.ResumenCargas;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
 import com.geasp.micro.mercancias.services.CargaService;
 import com.geasp.micro.mercancias.services.ParteCargasService;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
 @RequestMapping(value = "/cargas")
@@ -43,6 +48,8 @@ public class CargasController implements IMercanciaControllers<CargaResponse, Ca
 	
 	@Autowired
 	private ParteCargasService parte;
+	
+	private static final String MAIN_SERVICE = "mainService";
 	
 	@Override
 	@PostMapping
@@ -81,12 +88,25 @@ public class CargasController implements IMercanciaControllers<CargaResponse, Ca
 	}
 	
 	@GetMapping("/parte/fecha={fecha}")
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "ParteFallback")		
 	public ResponseEntity<ResumenCargas> getParte(@PathVariable("fecha") String fecha) {
 		LocalDate date = LocalDate.parse(fecha);
 		return ResponseEntity.ok(parte.makeParte(date));
 	}
+	public ResponseEntity<ResumenCargas> ParteFallback(@PathVariable("fecha") String fecha, Exception e) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");
+		return new ResponseEntity<ResumenCargas>(new ResumenCargas(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@GetMapping(value = "/pendientes")
+	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")	
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendietnes(){
 		return ResponseEntity.ok(parte.listarPendientes());
+	}
+	public ResponseEntity<List<ResumenPendientes>> ResumenPendientesCallback(){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
+		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 }

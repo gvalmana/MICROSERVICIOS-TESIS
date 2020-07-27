@@ -84,7 +84,6 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 				extracciones.saveAndFlush(extraccion);
 				ExtraccionResponse res = mapper.map(extraccion, ExtraccionResponse.class);
 				res.setMercancia(mercancia);
-				res.setMessage("Registro realizado con éxito.");
 				return res;
 			}else {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"El contenedor a extraer no existe");
@@ -152,7 +151,6 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 				extracciones.saveAndFlush(extraccionActualizada);
 				ExtraccionResponse res = mapper.map(extraccionActualizada, ExtraccionResponse.class);
 				Mercancia mercancia = get(extraccionActualizada.getMercanciaId()).block();
-				res.setMessage("Operación actualizada con éxito.");
 				res.setMercancia(mercancia);
 				return res;
 			}else {
@@ -173,7 +171,6 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 					Mercancia mercancia = revertir(extraccion.getMercanciaId()).block();
 					ExtraccionResponse res = mapper.map(extraccion, ExtraccionResponse.class);
 					res.setMercancia(mercancia);
-					res.setMessage("Operación revertida con éxito.");
 					extracciones.delete(extraccionOptional.get());
 					return res;
 				}else {
@@ -201,7 +198,6 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 				extracciones.saveAndFlush(extraccion);
 				ExtraccionResponse res = mapper.map(extraccion, ExtraccionResponse.class);
 				Mercancia mercancia = get(extraccion.getMercanciaId()).block();
-				res.setMessage("Operación actualizada con éxito.");
 				res.setMercancia(mercancia);
 				return res;
 			}else {

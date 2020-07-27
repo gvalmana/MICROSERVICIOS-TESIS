@@ -95,7 +95,6 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 				DevolucionResponse res = new DevolucionResponse();
 				res = mapper.map(devolucion, DevolucionResponse.class);
 				res.setExtraccion(resExtraccion);
-				res.setMessage("Registro realizado con éxito.");
 				return res;				
 			} else {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"La operación solicitada no es posible");
@@ -167,7 +166,6 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 				extraccion.setMercancia(mercancia);
 				DevolucionResponse res = mapper.map(actualizada, DevolucionResponse.class);				
 				res.setExtraccion(extraccion);
-				res.setMessage("Operación actualizada con éxito.");
 				return res;
 			}else {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"El operacion a actualizar no existe");
@@ -190,7 +188,6 @@ public class DevolucionesService implements IOperacionesService<DevolucionRespon
 					Mercancia mercancia = revertir(extraccion.getMercanciaId()).block();				
 					resExtraccion.setMercancia(mercancia);
 					res.setExtraccion(resExtraccion);
-					res.setMessage("Operación revertida con éxito.");
 					devoluciones.delete(optionalDevolucion.get());
 					return res;					
 				} else {
