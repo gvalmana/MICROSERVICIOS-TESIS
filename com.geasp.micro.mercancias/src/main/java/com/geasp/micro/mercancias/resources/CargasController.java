@@ -104,7 +104,7 @@ public class CargasController implements IMercanciaControllers<CargaResponse, Ca
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendietnes(){
 		return ResponseEntity.ok(parte.listarPendientes());
 	}
-	public ResponseEntity<List<ResumenPendientes>> ResumenPendientesCallback(){
+	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);

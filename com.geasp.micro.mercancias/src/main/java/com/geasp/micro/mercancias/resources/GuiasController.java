@@ -102,9 +102,10 @@ public class GuiasController implements IMercanciaControllers<GuiaResponse, Guia
 	@GetMapping(value = "/pendientes")
 	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendientes(){
+		System.out.println("BUSCAR ESTA LINEA");
 		return ResponseEntity.ok(parte.listarPendientes());
 	}
-	public ResponseEntity<List<ResumenPendientes>> ResumenPendientesCallback(){
+	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
