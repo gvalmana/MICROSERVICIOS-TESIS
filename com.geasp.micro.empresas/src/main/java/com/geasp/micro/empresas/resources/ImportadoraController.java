@@ -38,27 +38,7 @@ public class ImportadoraController {
 	private ImportadoraService service;
 	
 	@GetMapping
-	public ResponseEntity<List<Importadora>> listar(){
+	public ResponseEntity<List<String>> listar(){
 		return ResponseEntity.ok(service.listar());
 	}
-	
-	@GetMapping(value = "/{id}")
-	public ResponseEntity<Importadora> viewById(@PathVariable("id") String id){
-		return ResponseEntity.ok(service.viewById(id));
-	}	
-	
-	@PostMapping
-	public ResponseEntity<Importadora> save(@Validated @RequestBody Importadora entity){
-		return ResponseEntity.ok(service.Save(entity));
-	}
-	
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<Importadora> updateById(@PathVariable("id") String id, @Validated @RequestBody Importadora entity){	
-		return ResponseEntity.ok(service.updateById(id, entity));
-	}
-	
-	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<Importadora> deleteById(@PathVariable("id") String id){		
-		return ResponseEntity.ok(service.deleteById(id));
-	}	
 }

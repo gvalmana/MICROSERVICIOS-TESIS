@@ -38,27 +38,7 @@ public class PuertoController {
 	private PuertoService service;
 	
 	@GetMapping
-	public ResponseEntity<List<Puerto>> listar(){
+	public ResponseEntity<List<String>> listar(){
 		return ResponseEntity.ok(service.listar());
-	}
-	
-	@GetMapping(value = "/{id}")
-	public ResponseEntity<Puerto> viewById(@PathVariable("id") String id){
-		return ResponseEntity.ok(service.viewById(id));
-	}	
-	
-	@PostMapping
-	public ResponseEntity<Puerto> save(@Validated @RequestBody Puerto entity){
-		return ResponseEntity.ok(service.Save(entity));
-	}
-	
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<Puerto> updateById(@PathVariable("id") String id, @Validated @RequestBody Puerto entity){	
-		return ResponseEntity.ok(service.updateById(id, entity));
-	}
-	
-	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<Puerto> deleteById(@PathVariable("id") String id){		
-		return ResponseEntity.ok(service.deleteById(id));
 	}	
 }
