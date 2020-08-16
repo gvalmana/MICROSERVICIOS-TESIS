@@ -23,8 +23,7 @@ import com.geasp.micro.mercancias.models.EstadoMercancias;
 import com.geasp.micro.mercancias.requests.ContenedorRequest;
 import com.geasp.micro.mercancias.responses.ContenedorResponse;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
-import com.geasp.micro.mercancias.services.IMercanciaService;
-import com.geasp.micro.mercancias.services.ParteContenedoresService;
+import com.geasp.micro.mercancias.services.ContenedorService;
 import org.springframework.http.HttpHeaders;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -44,10 +43,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 public class ContenedoresController implements IMercanciaControllers<ContenedorResponse, ContenedorRequest> {
 	
 	@Autowired
-	private IMercanciaService<ContenedorResponse, ContenedorRequest> service;
-
-	@Autowired
-	private ParteContenedoresService parte;
+	private ContenedorService service;
 	
 	private static final String MAIN_SERVICE = "mainService";
 	
@@ -87,22 +83,10 @@ public class ContenedoresController implements IMercanciaControllers<ContenedorR
 		return ResponseEntity.ok(service.desactivateById(id));
 	}
 	
-//	@GetMapping("/parte/fecha={fecha}")
-//	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "ParteFallback")	
-//	public ResponseEntity<ResumenContenedores> getParte(@PathVariable("fecha") String fecha) {
-//		LocalDate date = LocalDate.parse(fecha);
-//		return ResponseEntity.ok(parte.makeParte(date));
-//	}
-//	public ResponseEntity<ResumenContenedores> ParteFallback(@PathVariable("fecha") String fecha, Exception e) {
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");
-//		return new ResponseEntity<ResumenContenedores>(new ResumenContenedores(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
-//	}	
-	
 	@GetMapping(value = "/pordevolver")
 	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "resumenPorDevolverCallback")	
 	public ResponseEntity<List<CantidadEmpresa>> getResumenPorDevolver(){
-		return ResponseEntity.ok(parte.listarContenedoresDevolver());
+		return ResponseEntity.ok(service.listarContenedoresDevolver());
 	}
 	public ResponseEntity<List<CantidadEmpresa>> resumenPorDevolverCallback(){
 		HttpHeaders headers = new HttpHeaders();
@@ -113,7 +97,7 @@ public class ContenedoresController implements IMercanciaControllers<ContenedorR
 	@GetMapping(value = "/pendientes")
 	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendientes(){
-		return ResponseEntity.ok(parte.listarPendientes());
+		return ResponseEntity.ok(service.listarPendientes());
 	}
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();

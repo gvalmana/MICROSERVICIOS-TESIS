@@ -22,7 +22,6 @@ import com.geasp.micro.mercancias.requests.GuiaRequest;
 import com.geasp.micro.mercancias.responses.GuiaResponse;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
 import com.geasp.micro.mercancias.services.GuiaService;
-import com.geasp.micro.mercancias.services.ParteGuiasService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -43,9 +42,6 @@ public class GuiasController implements IMercanciaControllers<GuiaResponse, Guia
 
 	@Autowired
 	private GuiaService service;
-	
-	@Autowired
-	private ParteGuiasService parte;
 	
 	private static final String MAIN_SERVICE = "mainService";	
 	
@@ -85,23 +81,11 @@ public class GuiasController implements IMercanciaControllers<GuiaResponse, Guia
 		return ResponseEntity.ok(service.listarPorEstado(estado));
 	}
 	
-//	@GetMapping("/parte/fecha={fecha}")
-//	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "ParteFallback")	
-//	public ResponseEntity<ResumenGuias> getParte(@PathVariable("fecha") String fecha) {
-//		LocalDate date = LocalDate.parse(fecha);
-//		return ResponseEntity.ok(parte.makeParte(date));
-//	}
-//	public ResponseEntity<ResumenGuias> ParteFallback(@PathVariable("fecha") String fecha, Exception e) {
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");
-//		return new ResponseEntity<ResumenGuias>(new ResumenGuias(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
-	
 	@GetMapping(value = "/pendientes")
 	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendientes(){
 		System.out.println("BUSCAR ESTA LINEA");
-		return ResponseEntity.ok(parte.listarPendientes());
+		return ResponseEntity.ok(service.listarPendientes());
 	}
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();

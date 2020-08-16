@@ -2,29 +2,44 @@ package com.geasp.micro.mercancias.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.dozer.Mapper;
+import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.geasp.micro.mercancias.conf.Calculos;
+import com.geasp.micro.mercancias.models.Cliente;
 import com.geasp.micro.mercancias.models.EstadoMercancias;
 import com.geasp.micro.mercancias.models.Guia;
 import com.geasp.micro.mercancias.repositories.GuiaRepository;
 import com.geasp.micro.mercancias.requests.GuiaRequest;
 import com.geasp.micro.mercancias.responses.GuiaResponse;
+import com.geasp.micro.mercancias.responses.ResumenPendientes;
+
+import reactor.core.publisher.Mono;
 
 @Service
 @EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class)
 public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>{
-
+	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
+	
+	@Autowired
+	private KeycloakSecurityContext securityContext;
+	
 	@Autowired
 	Mapper mapper;
 	
@@ -179,4 +194,46 @@ public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
+	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
+		return webClientBuilder.build().get()
+				.uri("http://EMPRESAS/v1/clientes/")
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<List<Cliente>>() {});
+	}
+	
+	public List<ResumenPendientes> listarPendientes(){
+		List<ResumenPendientes> res = new ArrayList<ResumenPendientes>();
+		List<Cliente> clientes = buscarTodasLasEmpresas().block();
+		List<Guia> guias = dao.findByEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
+
+		clientes.stream().forEach(index->{
+			int total=0;
+			int porHabilitar=0;
+			int sinEntregar=0;
+			int sinDescargar=0;
+			int paraExtraer=0;
+			for (Guia guia : guias) {
+				if (guia.getCliente().equals(index.getNombre())) {
+					total++;
+					if (guia.getFecha_habilitacion()==null) {
+						porHabilitar++;
+					}else if (guia.getFecha_documentos()==null) {
+						sinEntregar++;
+					}else if(guia.getFecha_arribo()==null) {
+						sinDescargar++;
+					}
+					paraExtraer = total-porHabilitar-sinEntregar-sinDescargar;
+				}				
+			}
+			if (total>0) {
+				res.add(new ResumenPendientes(index.getNombre(), total, paraExtraer, porHabilitar, sinEntregar, sinDescargar));
+			}
+		});
+		
+		return res;
+	}	
 }
