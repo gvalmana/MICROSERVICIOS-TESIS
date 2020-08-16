@@ -20,6 +20,13 @@ public class Operaciones {
 		// TODO Auto-generated constructor stub
 		this.lista = new ArrayList<CantidadEmpresa>();
 	}
+	
+	public Operaciones(String titulo, List<CantidadEmpresa> lista) {
+		super();
+		this.titulo = titulo;
+		this.lista = lista;
+		this.cantidad = lista.size();
+	}
 
 	public String getTitulo() {
 		return titulo;

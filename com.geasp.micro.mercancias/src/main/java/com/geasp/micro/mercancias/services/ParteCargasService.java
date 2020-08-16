@@ -59,14 +59,7 @@ public class ParteCargasService implements IParteService<ResumenCargas>{
 		return new ResumenCargas("Error en la confección del parte de las cargas agrupadas.");
 	}
 	
-	@Override
-//	@HystrixCommand(fallbackMethod = "makePartefallback", commandProperties = {
-//			@HystrixProperty(name="execution.isolation.strategy",value="SEMAPHORE"),
-//		//	@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-//			@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-//			@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-//			@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-//		})	
+	@Override	
 	public ResumenCargas makeParte(LocalDate date) {
 		// TODO Auto-generated method stub
 		ResumenCargas res = new ResumenCargas(cargasNombre);

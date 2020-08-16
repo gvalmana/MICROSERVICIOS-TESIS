@@ -37,7 +37,7 @@ public class ParteController {
 	private static final String MAIN_SERVICE = "mainService";
 	
 	@GetMapping("/fecha={fecha}")
-	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
+	//@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "parteFallback")
 	public ResponseEntity<Parte> getParteById(@PathVariable("fecha") String fecha){		
 		return ResponseEntity.ok(servicio.getParteByDate(fecha));
 	}

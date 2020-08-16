@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.partes.models.ResumenExtracciones;
+import com.geasp.micro.partes.models.ResumenGuias;
 import com.geasp.micro.partes.models.Parte;
 import com.geasp.micro.partes.models.ResumenCargas;
 import com.geasp.micro.partes.models.ResumenContenedores;
-import com.geasp.micro.partes.models.ResumenGuias;
 
 import reactor.core.publisher.Mono;
 
@@ -32,7 +32,12 @@ public class ParteService implements IParte {
 	
 	@Value("${partes.nombre}")
 	private String nombreParte;
-	
+	@Autowired
+	private ParteCarga parteCargas;
+	@Autowired
+	private ParteGuia parteGuias;
+	@Autowired
+	private ParteContenedor parteContedores;
 	@Override
 	public Parte getParteByDate(String date) {
 		// TODO Auto-generated method stub
@@ -44,13 +49,12 @@ public class ParteService implements IParte {
 		
 		ResumenExtracciones extracciones = getOperaciones(url).block();
 		
-		ResumenContenedores contenedores = getResumenContenedores(fecha).block();
+		ResumenContenedores contenedores = parteContedores.getResumenContenedores(fecha);
 		contenedores.setResumenSalidas(extracciones.getContenedores());
-		
-		ResumenCargas cargas =  getResumenCargas(fecha).block();
+		ResumenCargas cargas =  parteCargas.getResumenCargas(fecha);
 		cargas.setResumenSalidas(extracciones.getCargas());
 		
-		ResumenGuias guias = getResumenGuias(fecha).block();
+		ResumenGuias guias = parteGuias.getResumenGuias(fecha);
 		guias.setResumenSalidas(extracciones.getGuias());
 		
 		res.setContenedores(contenedores);
@@ -71,36 +75,38 @@ public class ParteService implements IParte {
 				.bodyToMono(ResumenExtracciones.class);
 	}
 	
-	private Mono<ResumenContenedores> getResumenContenedores(LocalDate data) {
-		return webClientBuilder.build().get()
-				.uri("http://MERCANCIAS/contenedores/parte/fecha="+data)
-				.headers(header->{
-					header.setBearerAuth(securityContext.getTokenString());
-					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-				})
-				.retrieve()
-				.bodyToMono(ResumenContenedores.class);
-	}
+//	private Mono<ResumenContenedores> getResumenContenedores(LocalDate data) {
+//		return webClientBuilder.build().get()
+//				.uri("http://MERCANCIAS/contenedores/parte/fecha="+data)
+//				.headers(header->{
+//					header.setBearerAuth(securityContext.getTokenString());
+//					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//				})
+//				.retrieve()
+//				.bodyToMono(ResumenContenedores.class);
+//	}
 	
-	private Mono<ResumenCargas> getResumenCargas(LocalDate data) {
-		return webClientBuilder.build().get()
-				.uri("http://MERCANCIAS/cargas/parte/fecha="+data)
-				.headers(header->{
-					header.setBearerAuth(securityContext.getTokenString());
-					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-				})
-				.retrieve()
-				.bodyToMono(ResumenCargas.class);
-	}
 	
-	private Mono<ResumenGuias> getResumenGuias(LocalDate data) {
-		return webClientBuilder.build().get()
-				.uri("http://MERCANCIAS/guias/parte/fecha="+data)
-				.headers(header->{
-					header.setBearerAuth(securityContext.getTokenString());
-					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-				})
-				.retrieve()
-				.bodyToMono(ResumenGuias.class);
-	}	
+//	private Mono<ResumenCargas> getResumenCargas(LocalDate data) {
+//		return webClientBuilder.build().get()
+//				.uri("http://MERCANCIAS/cargas/parte/fecha="+data)
+//				.headers(header->{
+//					header.setBearerAuth(securityContext.getTokenString());
+//					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//				})
+//				.retrieve()
+//				.bodyToMono(ResumenCargas.class);
+//	}
+	
+//	private Mono<ResumenGuias> getResumenGuias(LocalDate data) {
+//		return webClientBuilder.build().get()
+//				.uri("http://MERCANCIAS/guias/parte/fecha="+data)
+//				.headers(header->{
+//					header.setBearerAuth(securityContext.getTokenString());
+//					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//				})
+//				.retrieve()
+//				.bodyToMono(ResumenGuias.class);
+//	}
+
 }
