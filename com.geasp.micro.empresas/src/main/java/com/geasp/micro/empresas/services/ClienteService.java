@@ -31,11 +31,20 @@ public class ClienteService {
 		Optional<Cliente> optional = dao.findById(id);
 		if (optional.isPresent()) {
 			Cliente data = optional.get();
-			data.setCorreo(entity.getCorreo());
-			data.setDireccion(entity.getDireccion());
 			data.setNombre(entity.getNombre());
-			data.setTelefono(entity.getTelefono());			
-			return dao.save(entity);			
+			data.setDireccion(entity.getDireccion());
+			data.setReeup(entity.getReeup());
+			data.setNit(entity.getNit());
+			data.setBanco(entity.getBanco());
+			data.setSucursal(entity.getSucursal());
+			data.setCuc(entity.getCuc());
+			data.setCup(entity.getCup());
+			data.setRepresentante(entity.getRepresentante());
+			data.setFecha_resolucion(entity.getFecha_resolucion());
+			data.setResolucion_emisor(entity.getResolucion_emisor());
+			data.setResolucion_representante(entity.getResolucion_representante());
+			data.setActividad(entity.getActividad());
+			return dao.save(data);			
 		}else {
 			return null;
 		}

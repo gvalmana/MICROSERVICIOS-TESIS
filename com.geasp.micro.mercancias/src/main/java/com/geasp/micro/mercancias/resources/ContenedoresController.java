@@ -88,10 +88,10 @@ public class ContenedoresController implements IMercanciaControllers<ContenedorR
 	public ResponseEntity<List<CantidadEmpresa>> getResumenPorDevolver(){
 		return ResponseEntity.ok(service.listarContenedoresDevolver());
 	}
-	public ResponseEntity<List<CantidadEmpresa>> resumenPorDevolverCallback(){
+	public ResponseEntity<List<CantidadEmpresa>> resumenPorDevolverCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
-		return new ResponseEntity<List<CantidadEmpresa>>(new ArrayList<CantidadEmpresa>(), headers,HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<List<CantidadEmpresa>>(new ArrayList<CantidadEmpresa>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);	
 	}	
 	
 	@GetMapping(value = "/pendientes")
