@@ -1,11 +1,11 @@
 package com.geasp.micro.empresas.repositories;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import com.geasp.micro.empresas.models.Cliente;
 
-@Repository
+@RepositoryRestResource(collectionResourceRel = "clientes", path = "clientes")
 public interface ClientesRepository extends MongoRepository<Cliente, String>{
 
 }

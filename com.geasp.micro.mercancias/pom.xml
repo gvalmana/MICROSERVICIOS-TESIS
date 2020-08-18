@@ -22,6 +22,10 @@
 	</properties>
 
 	<dependencies>
+	  	<dependency>
+	    	<groupId>org.springframework.boot</groupId>
+	    	<artifactId>spring-boot-starter-data-rest</artifactId>
+	  	</dependency>	
 <!-- 	DEPENDENCIAS DE RESILIENCE4J	 -->
 		<dependency>
 		    <groupId>io.github.resilience4j</groupId>
