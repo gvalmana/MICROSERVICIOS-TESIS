@@ -10,9 +10,9 @@ import com.geasp.micro.mercancias.models.EstadoMercancias;
 public interface IMercanciaService<T,R> {
 	
 	public T save(R entity);
-	public List<T> listar();
+	public List<T> listar(Integer pageNo, Integer pageSize, String sortBy);
 	public List<T> listarPorFechaArribo(LocalDate date);
-	public List<T> listarPorEstado(EstadoMercancias estado);
+	public List<T> listarPorEstado(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy);
 	public T updateById(R request, Long id);
 	public T desactivateById(Long id);
 	public T viewById(Long id);

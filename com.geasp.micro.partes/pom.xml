@@ -22,6 +22,18 @@
 	</properties>
 
 	<dependencies>
+<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
+		<dependency>
+		    <groupId>io.springfox</groupId>
+		    <artifactId>springfox-swagger2</artifactId>
+		    <version>3.0.0</version>
+		</dependency>
+<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+		<dependency>
+		    <groupId>io.springfox</groupId>
+		    <artifactId>springfox-swagger-ui</artifactId>
+		    <version>3.0.0</version>
+		</dependency>	
 <!-- 	DEPENDENCIAS DE RESILIENCE4J	 -->
 		<dependency>
 		    <groupId>io.github.resilience4j</groupId>
@@ -71,17 +83,7 @@
 		    <groupId>org.keycloak</groupId>
 		    <artifactId>keycloak-spring-security-adapter</artifactId>
 		</dependency>
-		<dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger2</artifactId>
-		    <version>2.9.2</version>
-		</dependency>
 		
-		<dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger-ui</artifactId>
-		    <version>2.9.2</version>
-		</dependency>
 				
 		<dependency>
 		  <groupId>net.sf.dozer</groupId>

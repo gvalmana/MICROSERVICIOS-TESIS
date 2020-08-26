@@ -11,22 +11,30 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 import org.springframework.data.history.RevisionMetadata;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "tbl_guias", catalog = "bd_mercancias")
 @PrimaryKeyJoinColumn(name = "id")
 @Audited
+@ApiModel("Representa a una guía aérea como entidad especializada de las mercancias")
 public class Guia extends Mercancia{
 
 	@Column(name = "fd_dm")
 	@NotNull
+	@ApiModelProperty(value = "Representa el DM de la guía aérea")
 	private String dm;
 	
+	@ApiModelProperty(value = "Cantidad de bultos que tiene la guía")
 	@Column(name = "fd_cantidad_de_bultos")
 	private Long cantidad_de_bultos;
 	
+	@ApiModelProperty(value = "Peso de la guía aérea")
 	@Column(name = "fd_peso_de_la_carga")	
 	private Float peso;
 	
+	@ApiModelProperty(value = "Fecha de entrega de la guia por la aduana")
 	@Column(name = "fd_fecha_de_entrega")
 	private LocalDate fecha_entrega;
 	

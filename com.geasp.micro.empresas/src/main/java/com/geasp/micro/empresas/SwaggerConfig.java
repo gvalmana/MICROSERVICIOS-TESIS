@@ -1,4 +1,4 @@
-package com.geasp.micro.partes.conf;
+package com.geasp.micro.empresas;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

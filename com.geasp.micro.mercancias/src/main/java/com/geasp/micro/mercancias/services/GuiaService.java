@@ -11,8 +11,10 @@ import org.dozer.Mapper;
 import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,6 @@ import com.geasp.micro.mercancias.responses.ResumenPendientes;
 import reactor.core.publisher.Mono;
 
 @Service
-@EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class)
 public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>{
 	
 	@Autowired
@@ -41,10 +42,10 @@ public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>
 	private KeycloakSecurityContext securityContext;
 	
 	@Autowired
-	Mapper mapper;
+	private Mapper mapper;
 	
 	@Autowired
-	GuiaRepository dao;
+	private GuiaRepository dao;
 	
 	@Autowired
 	private Calculos calculos;	
@@ -58,11 +59,12 @@ public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>
 	}
 
 	@Override
-	public List<GuiaResponse> listar() {
+	public List<GuiaResponse> listar(Integer pageNo, Integer pageSize, String sortBy) {
 		try {
-			List<Guia> guias = dao.findAll();
-			if (guias.size()>0) {
-				List<GuiaResponse> response = llenarLista(guias);
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<Guia> guias = dao.findAll(paging);
+			if (guias.hasContent()) {
+				List<GuiaResponse> response = llenarLista(guias.getContent());
 				return response.stream().collect(Collectors.toList());
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de guías aereas no encontrados");
@@ -73,11 +75,12 @@ public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>
 	}
 
 	@Override
-	public List<GuiaResponse> listarPorEstado(EstadoMercancias estado) {
+	public List<GuiaResponse> listarPorEstado(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy) {
 		try {
-			List<Guia> guias = dao.findByEstado(estado);
-			if (guias.size()>0) {
-				return llenarLista(guias).stream().collect(Collectors.toList());
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<Guia> guias = dao.findByEstado(estado, paging);
+			if (guias.hasContent()) {
+				return llenarLista(guias.getContent()).stream().collect(Collectors.toList());
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de guías aereas no encontrados");
 			}

@@ -11,8 +11,10 @@ import org.dozer.Mapper;
 import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,6 @@ import com.geasp.micro.mercancias.responses.ResumenPendientes;
 import reactor.core.publisher.Mono;
 
 @Service
-@EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class)
 public class CargaService implements IMercanciaService<CargaResponse, CargaRequest> {
 	
 	@Autowired
@@ -41,10 +42,10 @@ public class CargaService implements IMercanciaService<CargaResponse, CargaReque
 	private WebClient.Builder webClientBuilder;
 	
 	@Autowired
-	CargaRepository dao;
+	private CargaRepository dao;
 	
 	@Autowired
-	Mapper mapper;
+	private Mapper mapper;
 	
 	@Autowired
 	private Calculos calculos;	
@@ -58,11 +59,12 @@ public class CargaService implements IMercanciaService<CargaResponse, CargaReque
 	}
 
 	@Override
-	public List<CargaResponse> listar() {
+	public List<CargaResponse> listar(Integer pageNo, Integer pageSize, String sortBy) {
 		try {
-			List<Carga> cargas = dao.findAll();
-			if (cargas.size()>0) {
-				return llenarLista(cargas).stream().collect(Collectors.toList());
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<Carga> cargas = dao.findAll(paging);
+			if (cargas.hasContent()) {
+				return llenarLista(cargas.getContent().stream().collect(Collectors.toList()));
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de cargas agrupadas no encontrados");
 			}
@@ -72,11 +74,12 @@ public class CargaService implements IMercanciaService<CargaResponse, CargaReque
 	}
 
 	@Override
-	public List<CargaResponse> listarPorEstado(EstadoMercancias estado) {
+	public List<CargaResponse> listarPorEstado(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy) {
 		try {
-			List<Carga> cargas = dao.findByEstado(estado);
-			if (cargas.size()>0) {
-				return llenarLista(cargas).stream().collect(Collectors.toList());
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));			
+			Page<Carga> cargas = dao.findByEstado(estado, paging);
+			if (cargas.hasContent()) {
+				return llenarLista(cargas.getContent()).stream().collect(Collectors.toList());
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de cargas agrupadas no encontrados");
 			}

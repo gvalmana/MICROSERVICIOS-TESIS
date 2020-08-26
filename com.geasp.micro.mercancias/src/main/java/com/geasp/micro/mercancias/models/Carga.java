@@ -11,30 +11,42 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 import org.springframework.data.history.RevisionMetadata;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "tbl_cargas", catalog = "bd_mercancias")
 @PrimaryKeyJoinColumn(name = "id")
 @Audited
+@ApiModel("Representa a una carga agrupada como una mercancia especializada")
 public class Carga extends Mercancia {
 
+	@ApiModelProperty(value = "Es el manifiesto del contendor", required = true)
 	@Column(name = "fd_manifiesto")
+	@NotNull
 	private String manifiesto;
 	
+	@ApiModelProperty(value = "Representa el DM de la carga agrupada")
 	@Column(name = "fd_dm")
 	private String dm;
 	
+	@ApiModelProperty(value = "Es número BL del contenedor", required = false)
 	@Column(name = "fd_bl")
 	private String bl;
 	
+	@ApiModelProperty(value = "Representa el codigo de un contenedor en el qeu arriba la carga")
 	@Column(name = "fd_codigo_contenedor")
 	private String codigo_contenedor;
 	
+	@ApiModelProperty(value = "Representa la fecha en que la carga es extradida el contenedor, a partir de aqui se cuenta la estadia")
 	@Column(name = "fd_fecha_desagrupe")
 	private LocalDate fecha_desagrupe;
 	
+	@ApiModelProperty(value = "Represetna la fecha en que la carga es puesta al dispocisión del cliente por parte de la aduana")
 	@Column(name = "fd_fecha_descarga")
 	private LocalDate fecha_descarga;
 	
+	@ApiModelProperty(value = "Puerto por donde arriba la mercancía", required = true)
 	@Column(name = "fd_puerto")
 	@NotNull
 	private String puerto;

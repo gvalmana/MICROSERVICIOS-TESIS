@@ -31,7 +31,7 @@ import com.geasp.micro.empresas.services.ClienteService;
 				RequestMethod.HEAD, 
 				RequestMethod.OPTIONS}, 
 		allowedHeaders = "*", 
-		allowCredentials = "true" )
+		allowCredentials = "true")
 public class ClienteController {
 	
 	@Autowired
@@ -53,8 +53,7 @@ public class ClienteController {
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Cliente> updateById(@PathVariable("id") String id, @Validated @RequestBody Cliente entity){	
-		return ResponseEntity.ok(service.updateById(id, entity));
+	public ResponseEntity<Cliente> update(@Validated @RequestBody Cliente entity, @PathVariable("id") String id){
+		return ResponseEntity.ok(service.updateById(entity, id));
 	}
-	
 }

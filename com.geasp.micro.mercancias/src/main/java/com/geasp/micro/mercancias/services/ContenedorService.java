@@ -11,8 +11,8 @@ import org.dozer.Mapper;
 import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -28,11 +28,12 @@ import com.geasp.micro.mercancias.repositories.ContenedorRepository;
 import com.geasp.micro.mercancias.requests.ContenedorRequest;
 import com.geasp.micro.mercancias.responses.ContenedorResponse;
 import com.geasp.micro.mercancias.responses.ResumenPendientes;
-
 import reactor.core.publisher.Mono;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 @Service
-@EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class)
 public class ContenedorService implements IMercanciaService<ContenedorResponse,ContenedorRequest> {
 	
 	@Autowired
@@ -59,11 +60,12 @@ public class ContenedorService implements IMercanciaService<ContenedorResponse,C
 	}
 	
 	@Override
-	public List<ContenedorResponse> listar() {
+	public List<ContenedorResponse> listar(Integer pageNo, Integer pageSize, String sortBy) {
 		try {
-			List<Contenedor> contenedores = dao.findAll();
-			if (contenedores.size()>0) {
-				return llenarLista(contenedores).stream().collect(Collectors.toList());				
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<Contenedor> contenedores = dao.findAll(paging);
+			if (contenedores.hasContent()) {
+				return llenarLista(contenedores.getContent().stream().collect(Collectors.toList()));				
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de contenedores no encontrados");
 			}			
@@ -73,11 +75,12 @@ public class ContenedorService implements IMercanciaService<ContenedorResponse,C
 	}
 
 	@Override
-	public List<ContenedorResponse> listarPorEstado(EstadoMercancias estado) {		
+	public List<ContenedorResponse> listarPorEstado(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy) {		
 		try {
-			List<Contenedor> contenedores = dao.findByEstado(estado);
-			if (contenedores.size()>0) {
-				return llenarLista(contenedores).stream().collect(Collectors.toList());
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<Contenedor> contenedores = dao.findByEstado(estado, paging);
+			if (contenedores.hasContent()) {
+				return llenarLista(contenedores.getContent().stream().collect(Collectors.toList()));
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de contenedores no encontrados");
 			}
@@ -227,7 +230,7 @@ public class ContenedorService implements IMercanciaService<ContenedorResponse,C
 			}
 		});
 		
-		return res;
+		return res.stream().collect(Collectors.toList());
 	}
 	
 	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
@@ -258,12 +261,12 @@ public class ContenedorService implements IMercanciaService<ContenedorResponse,C
 				resultado.add(new CantidadEmpresa(index.getNombre(), cantidad));
 			}
 		});		
-		return resultado;
+		return resultado.stream().collect(Collectors.toList());
 	}
 	
 	public List<CantidadEmpresa> listarContenedoresDevolver(){
 		List<Contenedor> lista = dao.findByEstado(EstadoMercancias.EXTRAIDA);
 		List<CantidadEmpresa> resumenOperaciones = listarPorEmpresas(lista);
-		return resumenOperaciones;
+		return resumenOperaciones.stream().collect(Collectors.toList());
 	}	
 }
