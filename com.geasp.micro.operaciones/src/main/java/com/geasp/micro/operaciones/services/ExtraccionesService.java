@@ -80,7 +80,6 @@ public class ExtraccionesService implements IOperacionesService<ExtraccionRespon
 			if (mercancia.getId()==id) {
 				Extraccion extraccion = mapper.map(entity, Extraccion.class);
 				extraccion.setMercanciaId(mercancia.getId());
-				extraccion.setTipoMercancia(mercancia.getTipo_mercancia());
 				extracciones.saveAndFlush(extraccion);
 				ExtraccionResponse res = mapper.map(extraccion, ExtraccionResponse.class);
 				res.setMercancia(mercancia);

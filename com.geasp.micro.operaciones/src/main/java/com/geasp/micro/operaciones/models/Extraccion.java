@@ -31,10 +31,6 @@ public class Extraccion extends Auditable<String> {
 	private LocalDate fecha;
 	
 	@NotNull
-	@Column(name = "fd_tipo_mercancia")
-	private String tipoMercancia;
-	
-	@NotNull
 	private boolean activo;
 	
 	public Extraccion() {
@@ -72,14 +68,6 @@ public class Extraccion extends Auditable<String> {
 
 	public void setActivo(boolean activo) {
 		this.activo = activo;
-	}
-
-	public String getTipoMercancia() {
-		return tipoMercancia;
-	}
-
-	public void setTipoMercancia(String tipoMercancia) {
-		this.tipoMercancia = tipoMercancia;
 	}
 	
 }

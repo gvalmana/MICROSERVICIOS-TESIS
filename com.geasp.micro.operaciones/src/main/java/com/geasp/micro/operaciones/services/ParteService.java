@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.keycloak.KeycloakSecurityContext;
@@ -56,6 +57,17 @@ public class ParteService implements IParteService{
 				.bodyToMono(Mercancia.class);
 	}
 	
+	private Mono<List<Mercancia>> getAll(){
+		return webClientBuilder.build().get()
+				.uri("http://MERCANCIAS/operaciones/")
+				.headers(header->{
+					header.setBearerAuth(securityContext.getTokenString());
+					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+				})
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<List<Mercancia>>() {});		
+	}
+	
 	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
 		return webClientBuilder.build().get()
 				.uri("http://EMPRESAS/v1/clientes/")
@@ -88,11 +100,11 @@ public class ParteService implements IParteService{
 	}
 	
 	private Operaciones makeContenedor(LocalDate fecha) {
-		
 		List<Extraccion> lista = extracciones.findByFecha(fecha)
 				.stream()
 				.filter(index->{
-					return index.getTipoMercancia().equals("Contenedor");
+					Mercancia temp = get(index.getMercanciaId()).block();					
+					return temp.getTipo_mercancia().equals("Contenedor");
 				}).collect(Collectors.toList());		
 		List<CantidadEmpresa> listaExtraccion = listarExtraccionesPorEmpresas(lista);
 		Operaciones contenedores = new Operaciones(
@@ -107,7 +119,8 @@ public class ParteService implements IParteService{
 		List<Extraccion> lista = extracciones.findByFecha(fecha)
 				.stream()
 				.filter(index->{
-					return index.getTipoMercancia().equals("Carga");
+					Mercancia temp = get(index.getMercanciaId()).block();
+					return temp.getTipo_mercancia().equals("Carga");
 				})
 				.collect(Collectors.toList());
 		List<CantidadEmpresa> listaExtraccion = listarExtraccionesPorEmpresas(lista);
@@ -120,7 +133,13 @@ public class ParteService implements IParteService{
 	
 	private Operaciones makeGuias(LocalDate fecha) {
 		
-		List<Extraccion> lista = extracciones.findByFechaAndTipoMercancia(fecha, "Guia");
+		List<Extraccion> lista = extracciones.findByFecha(fecha)
+				.stream()
+				.filter(index->{
+					Mercancia temp = get(index.getMercanciaId()).block();
+					return temp.getTipo_mercancia().equals("Guia");
+				})
+				.collect(Collectors.toList());
 		List<CantidadEmpresa> listaExtraccion = listarExtraccionesPorEmpresas(lista);		
 		Operaciones guias = new Operaciones(
 				tituloGuias,
