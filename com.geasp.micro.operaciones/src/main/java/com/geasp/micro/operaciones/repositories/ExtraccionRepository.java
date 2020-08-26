@@ -14,5 +14,4 @@ public interface ExtraccionRepository extends JpaRepository<Extraccion, Long> {
 	Optional<Extraccion> findByMercanciaId(Long mercanciaId);
 	List<Extraccion> findByFechaAndActivo(LocalDate fecha, boolean activo);
 	List<Extraccion> findByFecha(LocalDate fecha);
-	List<Extraccion> findByFechaAndTipoMercancia(LocalDate fecha, String tipoMercancia);
 }

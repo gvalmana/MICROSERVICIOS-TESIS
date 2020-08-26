@@ -12,7 +12,6 @@ import com.geasp.micro.operaciones.models.Extraccion;
 
 @Repository
 public interface DevolucionRepository extends JpaRepository<Devolucion, Long> {
-
 	Optional<Devolucion> findByExtraccion(Extraccion extraccion);
 	List<Devolucion> findByFechaAndActivo(LocalDate fecha_devolucion,boolean activo);
 	List<Devolucion> findByFecha(LocalDate fecha_devolucion);
