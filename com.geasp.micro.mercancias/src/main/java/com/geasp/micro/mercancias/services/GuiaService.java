@@ -59,12 +59,11 @@ public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>
 	}
 
 	@Override
-	public List<GuiaResponse> listar(Integer pageNo, Integer pageSize, String sortBy) {
+	public List<GuiaResponse> listar() {
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<Guia> guias = dao.findAll(paging);
-			if (guias.hasContent()) {
-				List<GuiaResponse> response = llenarLista(guias.getContent());
+			List<Guia> guias = dao.findAll();
+			if (guias.size()>0) {
+				List<GuiaResponse> response = llenarLista(guias);
 				return response.stream().collect(Collectors.toList());
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de guías aereas no encontrados");
@@ -75,12 +74,11 @@ public class GuiaService implements IMercanciaService<GuiaResponse, GuiaRequest>
 	}
 
 	@Override
-	public List<GuiaResponse> listarPorEstado(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy) {
+	public List<GuiaResponse> listarPorEstado(EstadoMercancias estado) {
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<Guia> guias = dao.findByEstado(estado, paging);
-			if (guias.hasContent()) {
-				return llenarLista(guias.getContent()).stream().collect(Collectors.toList());
+			List<Guia> guias = dao.findByEstado(estado);
+			if (guias.size()>0) {
+				return llenarLista(guias).stream().collect(Collectors.toList());
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de guías aereas no encontrados");
 			}

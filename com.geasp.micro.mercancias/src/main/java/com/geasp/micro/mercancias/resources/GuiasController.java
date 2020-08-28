@@ -61,12 +61,8 @@ public class GuiasController implements IMercanciaControllers<GuiaResponse, Guia
 	@Override
 	@GetMapping
 	@ApiOperation(value = "Busca todas las guías aereas", notes = "Devuelve la lista completa")
-	public ResponseEntity<List<GuiaResponse>> getAll(
-            @RequestParam(defaultValue = "0") Integer pageNo, 
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy
-			) {
-		return ResponseEntity.ok(service.listar(pageNo, pageSize, sortBy));
+	public ResponseEntity<List<GuiaResponse>> getAll() {
+		return ResponseEntity.ok(service.listar());
 	}
 
 	@Override
@@ -93,13 +89,8 @@ public class GuiasController implements IMercanciaControllers<GuiaResponse, Guia
 	@Override
 	@GetMapping(value = "/estado={estado}")
 	@ApiOperation(value = "Busca todas las guias segun un estado")
-	public ResponseEntity<List<GuiaResponse>> getAllByState(
-			@PathVariable("estado") EstadoMercancias estado,
-            @RequestParam(defaultValue = "0") Integer pageNo, 
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy
-            ) {
-		return ResponseEntity.ok(service.listarPorEstado(estado, pageNo, pageSize, sortBy));
+	public ResponseEntity<List<GuiaResponse>> getAllByState(@PathVariable("estado") EstadoMercancias estado) {
+		return ResponseEntity.ok(service.listarPorEstado(estado));
 	}
 	
 	@GetMapping(value = "/pendientes")

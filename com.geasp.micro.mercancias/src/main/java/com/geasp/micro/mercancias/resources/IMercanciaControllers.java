@@ -11,9 +11,9 @@ import com.geasp.micro.mercancias.models.EstadoMercancias;
 public interface IMercanciaControllers<T,R> {
 
 	public ResponseEntity<T> Save(R entity);
-	public ResponseEntity<List<T>> getAll(Integer pageNo, Integer pageSize, String sortBy);
+	public ResponseEntity<List<T>> getAll();
 	public ResponseEntity<T> getById(Long id);
 	public ResponseEntity<T> updateById(R data, Long id);
 	public ResponseEntity<T> desactivateById(Long id);
-	public ResponseEntity<List<T>> getAllByState(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy);
+	public ResponseEntity<List<T>> getAllByState(EstadoMercancias estado);
 }

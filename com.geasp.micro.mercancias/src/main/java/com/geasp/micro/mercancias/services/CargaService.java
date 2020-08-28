@@ -59,12 +59,11 @@ public class CargaService implements IMercanciaService<CargaResponse, CargaReque
 	}
 
 	@Override
-	public List<CargaResponse> listar(Integer pageNo, Integer pageSize, String sortBy) {
+	public List<CargaResponse> listar() {
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<Carga> cargas = dao.findAll(paging);
-			if (cargas.hasContent()) {
-				return llenarLista(cargas.getContent().stream().collect(Collectors.toList()));
+			List<Carga> cargas = dao.findAll();
+			if (cargas.size()>0) {
+				return llenarLista(cargas.stream().collect(Collectors.toList()));
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de cargas agrupadas no encontrados");
 			}
@@ -74,12 +73,11 @@ public class CargaService implements IMercanciaService<CargaResponse, CargaReque
 	}
 
 	@Override
-	public List<CargaResponse> listarPorEstado(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy) {
-		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));			
-			Page<Carga> cargas = dao.findByEstado(estado, paging);
-			if (cargas.hasContent()) {
-				return llenarLista(cargas.getContent()).stream().collect(Collectors.toList());
+	public List<CargaResponse> listarPorEstado(EstadoMercancias estado) {
+		try {			
+			List<Carga> cargas = dao.findByEstado(estado);
+			if (cargas.size()>0) {
+				return llenarLista(cargas).stream().collect(Collectors.toList());
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de cargas agrupadas no encontrados");
 			}

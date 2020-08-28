@@ -61,12 +61,8 @@ public class CargasController implements IMercanciaControllers<CargaResponse, Ca
 	@Override
 	@GetMapping
 	@ApiOperation(value = "Busca todas las cargas agrupadas", notes = "Devuelve la lista completa")
-	public ResponseEntity<List<CargaResponse>> getAll(
-            @RequestParam(defaultValue = "0") Integer pageNo, 
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy			
-			) {
-		return ResponseEntity.ok(service.listar(pageNo, pageSize, sortBy));
+	public ResponseEntity<List<CargaResponse>> getAll(			) {
+		return ResponseEntity.ok(service.listar());
 	}
 
 	@Override
@@ -94,12 +90,8 @@ public class CargasController implements IMercanciaControllers<CargaResponse, Ca
 	@GetMapping(value = "/estado={estado}")
 	@ApiOperation(value = "Lista todas las cargas dado une estado")
 	public ResponseEntity<List<CargaResponse>> getAllByState(
-			@PathVariable("estado") EstadoMercancias estado,
-            @RequestParam(defaultValue = "0") Integer pageNo, 
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy
-            ) {
-		return ResponseEntity.ok(service.listarPorEstado(estado, pageNo, pageSize, sortBy));
+			@PathVariable("estado") EstadoMercancias estado) {
+		return ResponseEntity.ok(service.listarPorEstado(estado));
 	}
 	
 	@GetMapping(value = "/pendientes")

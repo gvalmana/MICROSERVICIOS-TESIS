@@ -60,12 +60,11 @@ public class ContenedorService implements IMercanciaService<ContenedorResponse,C
 	}
 	
 	@Override
-	public List<ContenedorResponse> listar(Integer pageNo, Integer pageSize, String sortBy) {
+	public List<ContenedorResponse> listar() {
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<Contenedor> contenedores = dao.findAll(paging);
-			if (contenedores.hasContent()) {
-				return llenarLista(contenedores.getContent().stream().collect(Collectors.toList()));				
+			List<Contenedor> contenedores = dao.findAll();
+			if (contenedores.size()>0) {
+				return llenarLista(contenedores.stream().collect(Collectors.toList()));				
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de contenedores no encontrados");
 			}			
@@ -75,12 +74,11 @@ public class ContenedorService implements IMercanciaService<ContenedorResponse,C
 	}
 
 	@Override
-	public List<ContenedorResponse> listarPorEstado(EstadoMercancias estado, Integer pageNo, Integer pageSize, String sortBy) {		
+	public List<ContenedorResponse> listarPorEstado(EstadoMercancias estado) {		
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<Contenedor> contenedores = dao.findByEstado(estado, paging);
-			if (contenedores.hasContent()) {
-				return llenarLista(contenedores.getContent().stream().collect(Collectors.toList()));
+			List<Contenedor> contenedores = dao.findByEstado(estado);
+			if (contenedores.size()>0) {
+				return llenarLista(contenedores.stream().collect(Collectors.toList()));
 			} else {
 				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de contenedores no encontrados");
 			}

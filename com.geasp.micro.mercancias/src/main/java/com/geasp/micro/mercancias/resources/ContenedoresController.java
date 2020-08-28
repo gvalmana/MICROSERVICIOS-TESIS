@@ -61,24 +61,15 @@ public class ContenedoresController implements IMercanciaControllers<ContenedorR
 	@GetMapping
 	@Override
 	@ApiOperation(value = "Buscar todos los contenedores", notes = "Devuelve tos los contenedores sin filtrar")
-	public ResponseEntity<List<ContenedorResponse>> getAll(
-	            @RequestParam(defaultValue = "0") Integer pageNo, 
-	            @RequestParam(defaultValue = "10") Integer pageSize,
-	            @RequestParam(defaultValue = "id") String sortBy
-			){
-		return ResponseEntity.ok(service.listar(pageNo, pageSize, sortBy));
+	public ResponseEntity<List<ContenedorResponse>> getAll(){
+		return ResponseEntity.ok(service.listar());
 	}
 	
 	@GetMapping(value = "/estado={estado}")
 	@Override
 	@ApiOperation(value = "Busca todos los contenedores por un estado dado", notes = "Devuelve la lista de contenedores")
-	public ResponseEntity<List<ContenedorResponse>> getAllByState(
-			@PathVariable("estado") EstadoMercancias estado,
-            @RequestParam(defaultValue = "0") Integer pageNo, 
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy
-			){
-		return ResponseEntity.ok(service.listarPorEstado(estado, pageNo, pageSize, sortBy));
+	public ResponseEntity<List<ContenedorResponse>> getAllByState(@PathVariable("estado") EstadoMercancias estado){
+		return ResponseEntity.ok(service.listarPorEstado(estado));
 	}
 	
 	@GetMapping(value = "/{id}")
