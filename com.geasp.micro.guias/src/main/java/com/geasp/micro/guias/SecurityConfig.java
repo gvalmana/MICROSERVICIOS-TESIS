@@ -1,4 +1,4 @@
-package com.geasp.micro.contenedores;
+package com.geasp.micro.guias;
 
 import java.security.Principal;
 
@@ -63,8 +63,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
 		super.configure(http);
 		http.cors().and().authorizeRequests()
 			.antMatchers("/v2/**").permitAll()
-			.anyRequest().authenticated()
-			//.anyRequest().permitAll()
+			//.anyRequest().authenticated()
+			.anyRequest().permitAll()
 		.and().csrf().disable();
     }
     

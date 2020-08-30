@@ -3,7 +3,7 @@ package com.geasp.micro.mercancias.requests;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public class GuiaRequest extends MercanciaRequest implements Serializable{
+public class GuiaRequest implements Serializable{
 
 	/**
 	 * 

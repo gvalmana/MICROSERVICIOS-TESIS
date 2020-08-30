@@ -2,8 +2,6 @@ package com.geasp.micro.partes.models;
 
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotNull;
-
 public class Carga extends Mercancia {
 
 	private String manifiesto;

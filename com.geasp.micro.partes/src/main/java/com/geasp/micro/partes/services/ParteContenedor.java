@@ -135,7 +135,7 @@ public class ParteContenedor {
 	}
 	private List<Contenedor> getExtraer() {
 		return webClientBuilder.build().get()
-				.uri("http://MERCANCIAS/contenedores/estado=LISTO_PARA_EXTRAER")
+				.uri("http://MERCANCIAS/v1/buscarporestado?estado=LISTO_PARA_EXTRAER")
 				.headers(header->{
 					header.setBearerAuth(securityContext.getTokenString());
 					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -145,7 +145,7 @@ public class ParteContenedor {
 	}
 	private List<Contenedor> getExtraidos() {
 		return webClientBuilder.build().get()
-				.uri("http://MERCANCIAS/contenedores/estado=EXTRAIDA")
+				.uri("http://MERCANCIAS/v1/buscarporestado?estado=EXTRAIDA")
 				.headers(header->{
 					header.setBearerAuth(securityContext.getTokenString());
 					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

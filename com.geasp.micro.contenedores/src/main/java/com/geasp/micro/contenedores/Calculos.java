@@ -41,10 +41,10 @@ public class Calculos {
 			  res = "Listo para extraer";
 		    break;
 		  case EXTRAIDA:
-			  res = "Extraida";
+			  res = "Extraido";
 		    break;
 		  case DEVUELTA:
-			  res = "Devuelta";
+			  res = "Devuelto";
 			break;
 		  case DISABLE:
 			  res = "Disabled";
