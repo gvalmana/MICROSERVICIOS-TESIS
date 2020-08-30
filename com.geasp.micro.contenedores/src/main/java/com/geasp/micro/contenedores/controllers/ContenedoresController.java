@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.geasp.micro.contenedores.models.CantidadEmpresa;
@@ -65,10 +66,10 @@ public class ContenedoresController implements IContenedorController<ContenedorR
 		return ResponseEntity.ok(service.listar());
 	}
 	
-	@GetMapping(value = "/estado={estado}")
+	@GetMapping(value = "/buscarporestado")
 	@Override
 	@ApiOperation(value = "Busca todos los contenedores por un estado dado", notes = "Devuelve la lista de contenedores")
-	public ResponseEntity<List<ContenedorResponse>> getAllByState(@PathVariable("estado") EstadoMercancias estado){
+	public ResponseEntity<List<ContenedorResponse>> getAllByState(@RequestParam(name = "estado",defaultValue = "LISTO_PARA_EXTRAER") EstadoMercancias estado){
 		return ResponseEntity.ok(service.listarPorEstado(estado));
 	}
 	
