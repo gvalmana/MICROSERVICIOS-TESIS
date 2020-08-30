@@ -1,4 +1,4 @@
-package com.geasp.micro.mercancias.resources;
+package com.geasp.micro.contenedores.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.geasp.micro.mercancias.models.CantidadEmpresa;
-import com.geasp.micro.mercancias.models.EstadoMercancias;
-import com.geasp.micro.mercancias.requests.ContenedorRequest;
-import com.geasp.micro.mercancias.responses.ContenedorResponse;
-import com.geasp.micro.mercancias.responses.ResumenPendientes;
-import com.geasp.micro.mercancias.services.ContenedorService;
+import com.geasp.micro.contenedores.models.CantidadEmpresa;
+import com.geasp.micro.contenedores.models.EstadoMercancias;
+import com.geasp.micro.contenedores.requests.ContenedorRequest;
+import com.geasp.micro.contenedores.responses.ContenedorResponse;
+import com.geasp.micro.contenedores.responses.ResumenPendientes;
+import com.geasp.micro.contenedores.services.ContenedorService;
+
 import org.springframework.http.HttpHeaders;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.swagger.annotations.Api;
