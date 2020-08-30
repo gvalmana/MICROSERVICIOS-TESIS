@@ -8,7 +8,7 @@ import com.geasp.micro.contenedores.models.EstadoMercancias;
 
 //T Plantilla para los Responses
 //R Plantilla para los Request
-public interface IMercanciaService<T,R> {
+public interface IContenedorService<T,R> {
 	
 	public T save(R entity);
 	public List<T> listar();

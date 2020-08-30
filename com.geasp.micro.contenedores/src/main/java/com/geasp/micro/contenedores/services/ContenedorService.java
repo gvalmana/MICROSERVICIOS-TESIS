@@ -30,7 +30,7 @@ import com.geasp.micro.contenedores.responses.ResumenPendientes;
 import reactor.core.publisher.Mono;
 
 @Service
-public class ContenedorService implements IMercanciaService<ContenedorResponse,ContenedorRequest> {
+public class ContenedorService implements IContenedorService<ContenedorResponse,ContenedorRequest> {
 	
 	@Autowired
 	private ContenedorRepository dao;

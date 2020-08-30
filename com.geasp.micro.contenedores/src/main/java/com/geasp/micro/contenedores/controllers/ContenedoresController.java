@@ -31,7 +31,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping(value = "/contenedores")
+@RequestMapping(value = "/v1")
 @CrossOrigin(
 		origins = "*", 
 		methods = {
@@ -44,7 +44,7 @@ import io.swagger.annotations.ApiOperation;
 		allowedHeaders = "*", 
 		allowCredentials = "true" )
 @Api(value = "Microservicios de los contenedores", description = "Estas son las operaciones CRUD de los contenedores" )
-public class ContenedoresController implements IMercanciaControllers<ContenedorResponse, ContenedorRequest> {
+public class ContenedoresController implements IContenedorController<ContenedorResponse, ContenedorRequest> {
 	
 	@Autowired
 	private ContenedorService service;
@@ -102,7 +102,7 @@ public class ContenedoresController implements IMercanciaControllers<ContenedorR
 	public ResponseEntity<List<CantidadEmpresa>> resumenPorDevolverCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
-		return new ResponseEntity<List<CantidadEmpresa>>(new ArrayList<CantidadEmpresa>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);	
+		return new ResponseEntity<List<CantidadEmpresa>>(new ArrayList<CantidadEmpresa>(), headers, HttpStatus.NO_CONTENT);	
 	}	
 	
 	@GetMapping(value = "/pendientes")
@@ -114,6 +114,6 @@ public class ContenedoresController implements IMercanciaControllers<ContenedorR
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
-		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.NO_CONTENT);
 	}	
 }
