@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.geasp.micro.guias.models.EstadoMercancias;
 import com.geasp.micro.guias.requests.GuiaRequest;
+import com.geasp.micro.guias.requests.OperacionRequest;
 import com.geasp.micro.guias.responses.GuiaResponse;
 import com.geasp.micro.guias.responses.ResumenPendientes;
 import com.geasp.micro.guias.services.GuiaService;
@@ -44,7 +46,7 @@ import io.swagger.annotations.ApiOperation;
 		allowedHeaders = "*", 
 		allowCredentials = "true" )
 @Api(value = "Microservicio de Guías Aereas", description = "Son las operaciones CRUD sobre las guías aéreas")
-public class GuiasController implements IMercanciaControllers<GuiaResponse, GuiaRequest> {
+public class GuiasController implements IGuiasControllers<GuiaResponse, GuiaRequest> {
 
 	@Autowired
 	private GuiaService service;
@@ -104,5 +106,26 @@ public class GuiasController implements IMercanciaControllers<GuiaResponse, Guia
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@Override
+	@DeleteMapping(value = "/{id}")
+	@ApiOperation(value = "Elimina una guía aérea", notes = "Elimina una guía por su ID")
+	public ResponseEntity<GuiaResponse> deleteById(@PathVariable("id") Long id) {
+		return ResponseEntity.ok(service.deleteById(id));
+	}
+
+	@Override
+	@PostMapping(value = "/extraer/{id}")
+	@ApiOperation(value = "Extraer una guia", notes = "Cambia el estado de una mercancia a extraida por su ID")
+	public ResponseEntity<GuiaResponse> extractById(@PathVariable("id") Long id, @RequestBody @Valid  OperacionRequest date) {
+		return ResponseEntity.ok(service.extractById(id, date));
+	}
+
+	@Override
+	@PostMapping(value = "/revertir/{id}")
+	public ResponseEntity<GuiaResponse> revertById(@PathVariable("id") Long id) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.revertById(id));
 	}	
 }

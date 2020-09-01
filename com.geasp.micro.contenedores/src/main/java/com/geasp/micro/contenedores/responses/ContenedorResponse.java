@@ -43,8 +43,11 @@ public class ContenedorResponse implements Serializable{
 	@JsonFormat(pattern="yyyy-MM-dd") 
 	private LocalDate fecha_planificacion;
 	private int tamano;	
-	private String puerto;	
-	
+	private String puerto;
+	@JsonFormat(pattern="yyyy-MM-dd")
+	private LocalDate fecha_extraccion;
+	@JsonFormat(pattern="yyyy-MM-dd")
+	private LocalDate fecha_devolucion;	
 	public ContenedorResponse() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -232,6 +235,22 @@ public class ContenedorResponse implements Serializable{
 
 	public void setPuerto(String puerto) {
 		this.puerto = puerto;
+	}
+
+	public LocalDate getFecha_extraccion() {
+		return fecha_extraccion;
+	}
+
+	public void setFecha_extraccion(LocalDate fecha_extraccion) {
+		this.fecha_extraccion = fecha_extraccion;
+	}
+
+	public LocalDate getFecha_devolucion() {
+		return fecha_devolucion;
+	}
+
+	public void setFecha_devolucion(LocalDate fecha_devolucion) {
+		this.fecha_devolucion = fecha_devolucion;
 	}
 	
 }

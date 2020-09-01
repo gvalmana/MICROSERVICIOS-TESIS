@@ -23,13 +23,14 @@ import com.geasp.micro.cargas.models.Cliente;
 import com.geasp.micro.cargas.models.EstadoMercancias;
 import com.geasp.micro.cargas.repositories.CargaRepository;
 import com.geasp.micro.cargas.requets.CargaRequest;
+import com.geasp.micro.cargas.requets.OperacionRequest;
 import com.geasp.micro.cargas.responses.CargaResponse;
 import com.geasp.micro.cargas.responses.ResumenPendientes;
 
 import reactor.core.publisher.Mono;
 
 @Service
-public class CargaService implements IMercanciaService<CargaResponse, CargaRequest> {
+public class CargaService implements ICargaService<CargaResponse, CargaRequest> {
 	
 	@Autowired
 	private KeycloakSecurityContext securityContext;
@@ -232,5 +233,68 @@ public class CargaService implements IMercanciaService<CargaResponse, CargaReque
 		});
 		
 		return res;
+	}
+
+	@Override
+	public CargaResponse deleteById(Long id) {
+		try {
+			Optional<Carga> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				Carga carga = optional.get();
+				CargaResponse response = mapper.map(optional.get(), CargaResponse.class);
+				mappearDatos(carga, response);
+				dao.deleteById(id);
+				return response;
+			} else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La carga a eliminar no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public CargaResponse extractById(Long id, OperacionRequest date) {
+		// TODO Auto-generated method stub
+		try {
+			Optional<Carga> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				Carga carga = optional.get();
+				carga.setEstado(EstadoMercancias.EXTRAIDA);
+				carga.setFecha_extraccion(date.getFecha());
+				dao.saveAndFlush(carga);
+				CargaResponse response = mapper.map(carga, CargaResponse.class);
+				mappearDatos(carga, response);
+				return response;
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"La carga a extraer no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public CargaResponse revertById(Long id) {
+		try {
+			Optional<Carga> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				Carga carga = optional.get();
+				switch (carga.getEstado()) {
+				case EXTRAIDA:
+					carga.setEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
+					carga.setFecha_extraccion(null);
+				default:
+					break;
+				}
+				dao.saveAndFlush(carga);
+				CargaResponse response = mapper.map(carga, CargaResponse.class);
+				return response;
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"La carga a actualizar no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
 	}	
 }

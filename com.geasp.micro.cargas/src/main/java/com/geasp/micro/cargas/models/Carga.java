@@ -109,8 +109,9 @@ public class Carga extends Auditable<String> {
 	@NotNull
 	private String puerto;	
 	
-	@Transient
-	private RevisionMetadata<Long> editVersion;
+	@ApiModelProperty(value = "Es la fecha de extraccion de la carga agrupada del puerto")
+	@Column(name = "fd_fecha_extraccion")
+	private LocalDate fecha_extraccion;
 	
 	/*CONTRUCTORES*/
 	public Carga() {
@@ -198,15 +199,7 @@ public class Carga extends Auditable<String> {
 	public void setEstado(EstadoMercancias estado) {
 		this.estado = estado;
 	}
-
-	public RevisionMetadata<Long> getEditVersion() {
-		return editVersion;
-	}
-
-	public void setEditVersion(RevisionMetadata<Long> editVersion) {
-		this.editVersion = editVersion;
-	}
-
+	
 	public String getManifiesto() {
 		return manifiesto;
 	}
@@ -261,6 +254,14 @@ public class Carga extends Auditable<String> {
 
 	public void setPuerto(String puerto) {
 		this.puerto = puerto;
+	}
+
+	public LocalDate getFecha_extraccion() {
+		return fecha_extraccion;
+	}
+
+	public void setFecha_extraccion(LocalDate fecha_extraccion) {
+		this.fecha_extraccion = fecha_extraccion;
 	}
 
 }

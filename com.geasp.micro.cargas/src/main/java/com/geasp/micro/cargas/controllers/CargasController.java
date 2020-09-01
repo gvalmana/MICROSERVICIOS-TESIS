@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.geasp.micro.cargas.models.EstadoMercancias;
 import com.geasp.micro.cargas.requets.CargaRequest;
+import com.geasp.micro.cargas.requets.OperacionRequest;
 import com.geasp.micro.cargas.responses.CargaResponse;
 import com.geasp.micro.cargas.responses.ResumenPendientes;
 import com.geasp.micro.cargas.services.CargaService;
@@ -44,7 +46,7 @@ import io.swagger.annotations.ApiOperation;
 		allowedHeaders = "*", 
 		allowCredentials = "true" )
 @Api(value = "Microservicio de las cargas agrupadas", description = "Estas son las operaciones CRUD sobre las cargas agrupadas")
-public class CargasController implements IMercanciaControllers<CargaResponse, CargaRequest> {
+public class CargasController implements ICargasControllers<CargaResponse, CargaRequest> {
 
 	@Autowired
 	private CargaService service;
@@ -103,5 +105,28 @@ public class CargasController implements IMercanciaControllers<CargaResponse, Ca
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@Override
+	@DeleteMapping(value = "/{id}")
+	@ApiOperation(value = "Elimina una carga", notes = "Elimina  una carga por su ID")	
+	public ResponseEntity<CargaResponse> deleteById(@PathVariable("id") Long id) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.deleteById(id));
+	}
+
+	@Override
+	@PostMapping(value = "/extraer/{id}")
+	@ApiOperation(value = "Extraer un contenedor", notes = "Cambia el estado de una mercancia a extraida por su ID")		
+	public ResponseEntity<CargaResponse> extractById(@PathVariable("id") Long id, @RequestBody @Valid  OperacionRequest date) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.extractById(id, date));
+	}
+
+	@Override
+	@PostMapping(value = "/revertir/{id}")
+	public ResponseEntity<CargaResponse> revertById(@PathVariable("id") Long id) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.revertById(id));
 	}	
 }

@@ -94,10 +94,11 @@ public class Guia extends Auditable<String> {
 	
 	@ApiModelProperty(value = "Fecha de entrega de la guia por la aduana")
 	@Column(name = "fd_fecha_de_entrega")
-	private LocalDate fecha_entrega;	
+	private LocalDate fecha_entrega;
 	
-	@Transient
-	private RevisionMetadata<Long> editVersion;
+	@ApiModelProperty(value = "Es la fecha de extraccion de la guia en el aeropuerto")
+	@Column(name = "fd_fecha_extraccion")
+	private LocalDate fecha_extraccion;
 	
 	/*CONTRUCTORES*/
 	public Guia() {
@@ -105,32 +106,6 @@ public class Guia extends Auditable<String> {
 		this.estado = EstadoMercancias.LISTO_PARA_EXTRAER;
 	}
 	
-	
-	
-	public Guia(Long id, @NotNull LocalDate fecha_arribo, @NotNull LocalDate fecha_habilitacion,
-			@NotNull LocalDate fecha_documentos, String situacion, String observaciones, @NotNull String descripcion,
-			@NotNull String cliente, @NotNull String importadora, @NotNull EstadoMercancias estado, @NotNull String dm,
-			Long cantidad_de_bultos, Float peso, LocalDate fecha_entrega, RevisionMetadata<Long> editVersion) {
-		super();
-		this.id = id;
-		this.fecha_arribo = fecha_arribo;
-		this.fecha_habilitacion = fecha_habilitacion;
-		this.fecha_documentos = fecha_documentos;
-		this.situacion = situacion;
-		this.observaciones = observaciones;
-		this.descripcion = descripcion;
-		this.cliente = cliente;
-		this.importadora = importadora;
-		this.estado = estado;
-		this.dm = dm;
-		this.cantidad_de_bultos = cantidad_de_bultos;
-		this.peso = peso;
-		this.fecha_entrega = fecha_entrega;
-		this.editVersion = editVersion;
-	}
-
-
-
 	/*GETTERS AND SETTERS*/
 	public Long getId() {
 		return id;
@@ -212,14 +187,6 @@ public class Guia extends Auditable<String> {
 		this.estado = estado;
 	}
 
-	public RevisionMetadata<Long> getEditVersion() {
-		return editVersion;
-	}
-
-	public void setEditVersion(RevisionMetadata<Long> editVersion) {
-		this.editVersion = editVersion;
-	}
-
 	public String getDm() {
 		return dm;
 	}
@@ -250,6 +217,14 @@ public class Guia extends Auditable<String> {
 
 	public void setFecha_entrega(LocalDate fecha_entrega) {
 		this.fecha_entrega = fecha_entrega;
+	}
+
+	public LocalDate getFecha_extraccion() {
+		return fecha_extraccion;
+	}
+
+	public void setFecha_extraccion(LocalDate fecha_extraccion) {
+		this.fecha_extraccion = fecha_extraccion;
 	}
 
 }

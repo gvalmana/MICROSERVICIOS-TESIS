@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.geasp.micro.contenedores.models.EstadoMercancias;
+import com.geasp.micro.contenedores.requests.OperacionRequest;
 
 
 //T Plantilla para los Responses
@@ -16,5 +17,10 @@ public interface IContenedorService<T,R> {
 	public List<T> listarPorEstado(EstadoMercancias estado);
 	public T updateById(R request, Long id);
 	public T desactivateById(Long id);
+	public T deleteById(Long id);
 	public T viewById(Long id);
+	
+	public T extractById(Long id, OperacionRequest date);
+	public T devolverById(Long id, OperacionRequest date);
+	public T revertById(Long id);	
 }

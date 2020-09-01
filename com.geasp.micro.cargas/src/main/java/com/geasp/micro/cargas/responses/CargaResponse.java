@@ -3,7 +3,6 @@ package com.geasp.micro.cargas.responses;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Calendar;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class CargaResponse implements Serializable{
@@ -45,6 +44,8 @@ public class CargaResponse implements Serializable{
 	private LocalDate fecha_descarga;
 	private int cantidad_dias_desagrupada;
 	private String puerto;
+	@JsonFormat(pattern="yyyy-MM-dd")
+	private LocalDate fecha_extraccion;	
 	public CargaResponse() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -240,6 +241,14 @@ public class CargaResponse implements Serializable{
 
 	public void setPuerto(String puerto) {
 		this.puerto = puerto;
+	}
+
+	public LocalDate getFecha_extraccion() {
+		return fecha_extraccion;
+	}
+
+	public void setFecha_extraccion(LocalDate fecha_extraccion) {
+		this.fecha_extraccion = fecha_extraccion;
 	}
 	
 }

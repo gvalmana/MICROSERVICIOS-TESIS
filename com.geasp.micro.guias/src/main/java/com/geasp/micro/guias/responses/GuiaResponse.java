@@ -42,6 +42,8 @@ public class GuiaResponse implements Serializable{
 	private LocalDate fecha_entrega;
 	private int dias_declarada;
 	private int dias_entregada;
+	@JsonFormat(pattern="yyyy-MM-dd")
+	private LocalDate fecha_extraccion;
 	public GuiaResponse() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -221,6 +223,14 @@ public class GuiaResponse implements Serializable{
 
 	public void setDias_entregada(int dias_entregada) {
 		this.dias_entregada = dias_entregada;
+	}
+
+	public LocalDate getFecha_extraccion() {
+		return fecha_extraccion;
+	}
+
+	public void setFecha_extraccion(LocalDate fecha_extraccion) {
+		this.fecha_extraccion = fecha_extraccion;
 	}
 	
 }

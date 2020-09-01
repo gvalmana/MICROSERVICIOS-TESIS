@@ -23,6 +23,7 @@ import com.geasp.micro.guias.models.EstadoMercancias;
 import com.geasp.micro.guias.models.Guia;
 import com.geasp.micro.guias.repositories.GuiaRepository;
 import com.geasp.micro.guias.requests.GuiaRequest;
+import com.geasp.micro.guias.requests.OperacionRequest;
 import com.geasp.micro.guias.responses.GuiaResponse;
 import com.geasp.micro.guias.responses.ResumenPendientes;
 
@@ -232,5 +233,68 @@ public class GuiaService implements IGuiaService<GuiaResponse, GuiaRequest>{
 		});
 		
 		return res;
+	}
+
+	@Override
+	public GuiaResponse deleteById(Long id) {
+		// TODO Auto-generated method stub
+		try {
+			Optional<Guia> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				Guia guia = optional.get();
+				GuiaResponse response = mapper.map(guia, GuiaResponse.class);
+				mappearDatos(optional.get(), response);
+				dao.deleteById(id);
+				return response;
+			} else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La guía a eliminar no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public GuiaResponse extractById(Long id, OperacionRequest date) {
+		try {
+			Optional<Guia> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				Guia guia = optional.get();
+				guia.setEstado(EstadoMercancias.EXTRAIDA);
+				guia.setFecha_extraccion(date.getFecha());
+				GuiaResponse response = mapper.map(guia, GuiaResponse.class);
+				mappearDatos(guia, response);
+				return response;
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Guía no encontrada");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public GuiaResponse revertById(Long id) {
+		try {
+			Optional<Guia> optional = dao.findById(id);
+			if (optional.isPresent()) {
+				Guia guia = optional.get();
+				switch (guia.getEstado()) {
+				case EXTRAIDA:
+					guia.setEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
+					guia.setFecha_extraccion(null);
+				default:
+					break;
+				}
+				dao.saveAndFlush(guia);
+				GuiaResponse response = mapper.map(guia, GuiaResponse.class);
+				mappearDatos(guia, response);
+				return response;
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Guía no encontrada");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
 	}	
 }

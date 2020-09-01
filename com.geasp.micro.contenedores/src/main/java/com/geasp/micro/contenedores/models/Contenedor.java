@@ -11,11 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
-import org.springframework.data.history.RevisionMetadata;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -27,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Table(name = "tbl_contenedores", catalog = "bd_contenedores")
 @Audited
 @ApiModel("Representa un contenedor como entidad")
-public class Contenedor extends Auditable<String> {
+public class Contenedor extends Auditable<String>{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -109,38 +107,18 @@ public class Contenedor extends Auditable<String> {
 	@NotNull
 	private String puerto;	
 	
-	@Transient
-	private RevisionMetadata<Long> editVersion;
+	@ApiModelProperty(value = "Es la fecha de extraccion del contenedor del puerto")
+	@Column(name = "fd_fecha_extraccion")
+	private LocalDate fecha_extraccion;
+	
+	@ApiModelProperty(value = "Es la fecha de devolucion del contenedor por parte del cliente")
+	@Column(name = "fd_fecha_devolucion")
+	private LocalDate fecha_devolucion;
 	
 	/*CONTRUCTORES*/
 	public Contenedor() {
 		super();
 		this.estado = EstadoMercancias.LISTO_PARA_EXTRAER;
-	}
-	
-	public Contenedor(Long id, @NotNull LocalDate fecha_arribo, @NotNull LocalDate fecha_habilitacion,
-			@NotNull LocalDate fecha_documentos, String situacion, String observaciones, @NotNull String descripcion,
-			@NotNull String cliente, @NotNull String importadora, @NotNull EstadoMercancias estado,
-			@NotNull String codigo, @NotNull String manifiesto, String bl, LocalDate fecha_planificacion,
-			@NotNull int tamano, @NotNull String puerto, RevisionMetadata<Long> editVersion) {
-		super();
-		this.id = id;
-		this.fecha_arribo = fecha_arribo;
-		this.fecha_habilitacion = fecha_habilitacion;
-		this.fecha_documentos = fecha_documentos;
-		this.situacion = situacion;
-		this.observaciones = observaciones;
-		this.descripcion = descripcion;
-		this.cliente = cliente;
-		this.importadora = importadora;
-		this.estado = estado;
-		this.codigo = codigo;
-		this.manifiesto = manifiesto;
-		this.bl = bl;
-		this.fecha_planificacion = fecha_planificacion;
-		this.tamano = tamano;
-		this.puerto = puerto;
-		this.editVersion = editVersion;
 	}
 	
 	/*GETTERS AND SETTERS*/
@@ -224,14 +202,6 @@ public class Contenedor extends Auditable<String> {
 		this.estado = estado;
 	}
 
-	public RevisionMetadata<Long> getEditVersion() {
-		return editVersion;
-	}
-
-	public void setEditVersion(RevisionMetadata<Long> editVersion) {
-		this.editVersion = editVersion;
-	}
-
 	public String getCodigo() {
 		return codigo;
 	}
@@ -280,4 +250,20 @@ public class Contenedor extends Auditable<String> {
 		this.puerto = puerto;
 	}
 
+	public LocalDate getFecha_extraccion() {
+		return fecha_extraccion;
+	}
+
+	public void setFecha_extraccion(LocalDate fecha_extraccion) {
+		this.fecha_extraccion = fecha_extraccion;
+	}
+
+	public LocalDate getFecha_devolucion() {
+		return fecha_devolucion;
+	}
+
+	public void setFecha_devolucion(LocalDate fecha_devolucion) {
+		this.fecha_devolucion = fecha_devolucion;
+	}
+	
 }

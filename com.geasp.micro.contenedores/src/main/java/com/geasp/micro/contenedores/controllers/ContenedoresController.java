@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.geasp.micro.contenedores.models.CantidadEmpresa;
 import com.geasp.micro.contenedores.models.EstadoMercancias;
 import com.geasp.micro.contenedores.requests.ContenedorRequest;
+import com.geasp.micro.contenedores.requests.OperacionRequest;
 import com.geasp.micro.contenedores.responses.ContenedorResponse;
 import com.geasp.micro.contenedores.responses.ResumenPendientes;
 import com.geasp.micro.contenedores.services.ContenedorService;
@@ -116,5 +118,36 @@ public class ContenedoresController implements IContenedorController<ContenedorR
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.NO_CONTENT);
+	}
+
+	@Override
+	@PostMapping(value = "/extraer/{id}")
+	@ApiOperation(value = "Extraer un contenedor", notes = "Cambia el estado de un contenedor a extraido por su ID")	
+	public ResponseEntity<ContenedorResponse> extractById(@PathVariable("id") Long id, @RequestBody @Valid  OperacionRequest date) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.extractById(id, date));
+	}
+
+	@Override
+	@PostMapping(value = "/devolver/{id}")
+	@ApiOperation(value = "Devolve un contenedor", notes = "Cambia el estado de un contenedor a devuelto por su ID")	
+	public ResponseEntity<ContenedorResponse> devolverById(@PathVariable("id") Long id, @RequestBody @Valid  OperacionRequest date) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.devolverById(id, date));
+	}
+
+	@Override
+	@PostMapping(value = "/revertir/{id}")
+	@ApiOperation(value = "Revierte operacion", notes = "Revierte el estado de un contenedor a su anterior por si ID")		
+	public ResponseEntity<ContenedorResponse> revertById(@PathVariable("id") Long id) {
+		return ResponseEntity.ok(service.revertById(id));
+	}
+
+	@Override
+	@DeleteMapping(value = "/{id}")
+	@ApiOperation(value = "Elimina un contenedor", notes = "Elimina un contenedor por su ID")	
+	public ResponseEntity<ContenedorResponse> deleteById(@PathVariable("id") Long id) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.deleteById(id));
 	}	
 }
