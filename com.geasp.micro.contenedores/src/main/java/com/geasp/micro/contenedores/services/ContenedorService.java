@@ -1,34 +1,23 @@
 package com.geasp.micro.contenedores.services;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.dozer.Mapper;
-import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.geasp.micro.contenedores.Calculos;
-import com.geasp.micro.contenedores.models.CantidadEmpresa;
-import com.geasp.micro.contenedores.models.Cliente;
 import com.geasp.micro.contenedores.models.Contenedor;
 import com.geasp.micro.contenedores.models.EstadoMercancias;
 import com.geasp.micro.contenedores.repositories.ContenedorRepository;
 import com.geasp.micro.contenedores.requests.ContenedorRequest;
 import com.geasp.micro.contenedores.requests.OperacionRequest;
 import com.geasp.micro.contenedores.responses.ContenedorResponse;
-import com.geasp.micro.contenedores.responses.ResumenPendientes;
-
-import reactor.core.publisher.Mono;
 
 @Service
 public class ContenedorService implements IContenedorService<ContenedorResponse,ContenedorRequest> {
@@ -41,12 +30,6 @@ public class ContenedorService implements IContenedorService<ContenedorResponse,
 	
 	@Autowired
 	private Calculos calculos;
-	
-	@Autowired
-	private KeycloakSecurityContext securityContext;
-		
-	@Autowired
-	private WebClient.Builder webClientBuilder;
 	
 	@Override
 	public ContenedorResponse save(ContenedorRequest entity) {
@@ -178,93 +161,7 @@ public class ContenedorService implements IContenedorService<ContenedorResponse,
 		});	
 		return response;
 	}
-
-	@Override
-	public List<ContenedorResponse> listarPorFechaArribo(LocalDate date) {
-		// TODO Auto-generated method stub
-		try {
-			List<Contenedor> contenedores = dao.findAll().stream().filter(index->{
-				return index.getFecha_arribo().equals(date);
-			}).collect(Collectors.toList());
-			if (contenedores.size()>0) {
-				return llenarLista(contenedores).stream().collect(Collectors.toList());				
-			} else {
-				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de contenedores no encontrados");
-			}			
-		} catch (ResponseStatusException e) {
-			throw new ResponseStatusException(e.getStatus(), e.getMessage());
-		}
-	}
 	
-	public List<ResumenPendientes> listarPendientes(){
-		List<ResumenPendientes> res = new ArrayList<ResumenPendientes>();
-		List<Cliente> clientes = buscarTodasLasEmpresas().block();
-		List<Contenedor> contenedores = dao.findByEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
-
-		clientes.stream().forEach(index->{
-			int total=0;
-			int porHabilitar=0;
-			int sinEntregar=0;
-			int sinDescargar=0;
-			int paraExtraer=0;
-			for (Contenedor contenedor : contenedores) {
-				if (contenedor.getCliente().equals(index.getNombre())) {
-					total++;
-					if (contenedor.getFecha_habilitacion()==null) {
-						porHabilitar++;
-					}else if (contenedor.getFecha_documentos()==null) {
-						sinEntregar++;
-					}else if(contenedor.getFecha_arribo()==null) {
-						sinDescargar++;
-					}
-					paraExtraer = total-porHabilitar-sinEntregar-sinDescargar;
-				}				
-			}
-			if (total>0) {
-				res.add(new ResumenPendientes(index.getNombre(), total, paraExtraer, porHabilitar, sinEntregar, sinDescargar));
-			}
-		});
-		
-		return res.stream().collect(Collectors.toList());
-	}
-	
-	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
-		return webClientBuilder.build().get()
-				.uri("http://EMPRESAS/v1/clientes/")
-				.headers(header->{
-					header.setBearerAuth(securityContext.getTokenString());
-					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-				})
-				.retrieve()
-				.bodyToMono(new ParameterizedTypeReference<List<Cliente>>() {});
-	}
-	
-	private List<CantidadEmpresa> listarPorEmpresas(List<Contenedor> data){
-		List<Cliente> clientes = buscarTodasLasEmpresas().block();
-		List<CantidadEmpresa> resultado = new ArrayList<CantidadEmpresa>();
-		//RECORRE TODA LA LISTA DE CLIENTES
-		clientes.stream().forEach(index -> {
-			int cantidad = 0;
-			//RECORRE LA LISTA DE CONTENEDORES PARA EXTRAER
-			for (Contenedor item : data) {
-				//SI ES EL MISMO CLIENTE AGREGA UN CONTADOR
-				if (index.getNombre().equals(item.getCliente())) {
-					cantidad++;
-				}
-			}
-			if (cantidad>0) {
-				resultado.add(new CantidadEmpresa(index.getNombre(), cantidad));
-			}
-		});		
-		return resultado.stream().collect(Collectors.toList());
-	}
-	
-	public List<CantidadEmpresa> listarContenedoresDevolver(){
-		List<Contenedor> lista = dao.findByEstado(EstadoMercancias.EXTRAIDA);
-		List<CantidadEmpresa> resumenOperaciones = listarPorEmpresas(lista);
-		return resumenOperaciones.stream().collect(Collectors.toList());
-	}
-
 	@Override
 	public ContenedorResponse extractById(Long id, OperacionRequest date) {
 		// TODO Auto-generated method stub

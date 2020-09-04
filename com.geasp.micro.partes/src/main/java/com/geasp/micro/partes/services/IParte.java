@@ -1,8 +1,9 @@
 package com.geasp.micro.partes.services;
 
-import com.geasp.micro.partes.models.Parte;
+import java.util.List;
+import com.geasp.micro.partes.models.ResumenPendientes;
 
 public interface IParte {
-
-	Parte getParteByDate(String date);
+	
+	List<ResumenPendientes> getPendientes();
 }

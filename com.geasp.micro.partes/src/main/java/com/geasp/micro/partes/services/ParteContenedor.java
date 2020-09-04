@@ -36,7 +36,7 @@ public class ParteContenedor {
 	private int estadiaMinimo;	
 	@Value("${estadia.maximo}")
 	private int estadiaMaximo;	
-	@Value("${partes.operaciones.contenedores.nombre}")
+	@Value("${partes.operaciones.contenedores.entradas}")
 	private String titulo;
 	
 	public ResumenContenedores getResumenContenedores(LocalDate date) {
@@ -135,7 +135,7 @@ public class ParteContenedor {
 	}
 	private List<Contenedor> getExtraer() {
 		return webClientBuilder.build().get()
-				.uri("http://MERCANCIAS/v1/buscarporestado?estado=LISTO_PARA_EXTRAER")
+				.uri("http://CONTENEDORES/v1/buscarporestado?estado=LISTO_PARA_EXTRAER")
 				.headers(header->{
 					header.setBearerAuth(securityContext.getTokenString());
 					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -145,7 +145,7 @@ public class ParteContenedor {
 	}
 	private List<Contenedor> getExtraidos() {
 		return webClientBuilder.build().get()
-				.uri("http://MERCANCIAS/v1/buscarporestado?estado=EXTRAIDA")
+				.uri("http://CONTENEDORES/v1/buscarporestado?estado=EXTRAIDA")
 				.headers(header->{
 					header.setBearerAuth(securityContext.getTokenString());
 					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

@@ -1,12 +1,10 @@
 package com.geasp.micro.contenedores.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,17 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.geasp.micro.contenedores.models.CantidadEmpresa;
 import com.geasp.micro.contenedores.models.EstadoMercancias;
 import com.geasp.micro.contenedores.requests.ContenedorRequest;
 import com.geasp.micro.contenedores.requests.OperacionRequest;
 import com.geasp.micro.contenedores.responses.ContenedorResponse;
-import com.geasp.micro.contenedores.responses.ResumenPendientes;
 import com.geasp.micro.contenedores.services.ContenedorService;
-
-import org.springframework.http.HttpHeaders;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -51,8 +43,6 @@ public class ContenedoresController implements IContenedorController<ContenedorR
 	
 	@Autowired
 	private ContenedorService service;
-	
-	private static final String MAIN_SERVICE = "mainService";
 	
 	@PostMapping
 	@Override
@@ -96,30 +86,6 @@ public class ContenedoresController implements IContenedorController<ContenedorR
 		return ResponseEntity.ok(service.desactivateById(id));
 	}
 	
-	@GetMapping(value = "/pordevolver")
-	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "resumenPorDevolverCallback")
-	@ApiOperation(value = "Crea un resumen de los contenedores por devolver por cada cliente")
-	public ResponseEntity<List<CantidadEmpresa>> getResumenPorDevolver(){
-		return ResponseEntity.ok(service.listarContenedoresDevolver());
-	}
-	public ResponseEntity<List<CantidadEmpresa>> resumenPorDevolverCallback(Exception e){
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
-		return new ResponseEntity<List<CantidadEmpresa>>(new ArrayList<CantidadEmpresa>(), headers, HttpStatus.NO_CONTENT);	
-	}	
-	
-	@GetMapping(value = "/pendientes")
-	@ApiOperation(value = "Lista los contenedores pendientes por cada cliente")
-	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")
-	public ResponseEntity<List<ResumenPendientes>> getResumenPendientes(){
-		return ResponseEntity.ok(service.listarPendientes());
-	}
-	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
-		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.NO_CONTENT);
-	}
-
 	@Override
 	@PostMapping(value = "/extraer/{id}")
 	@ApiOperation(value = "Extraer un contenedor", notes = "Cambia el estado de un contenedor a extraido por su ID")	

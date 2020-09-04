@@ -1,4 +1,4 @@
-package com.geasp.micro.contenedores.responses;
+package com.geasp.micro.partes.models;
 
 public class ResumenPendientes {
 

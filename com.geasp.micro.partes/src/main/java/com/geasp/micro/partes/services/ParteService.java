@@ -3,6 +3,7 @@ package com.geasp.micro.partes.services;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.List;
 
 import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.partes.models.ResumenExtracciones;
 import com.geasp.micro.partes.models.ResumenGuias;
+import com.geasp.micro.partes.models.ResumenPendientes;
 import com.geasp.micro.partes.models.Parte;
 import com.geasp.micro.partes.models.ResumenCargas;
 import com.geasp.micro.partes.models.ResumenContenedores;
@@ -38,7 +40,7 @@ public class ParteService implements IParte {
 	private ParteGuia parteGuias;
 	@Autowired
 	private ParteContenedor parteContedores;
-	@Override
+	
 	public Parte getParteByDate(String date) {
 		// TODO Auto-generated method stub
 		LocalDate fecha = LocalDate.parse(date);
@@ -73,6 +75,12 @@ public class ParteService implements IParte {
 				})
 				.retrieve()
 				.bodyToMono(ResumenExtracciones.class);
+	}
+
+	@Override
+	public List<ResumenPendientes> getPendientes() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 //	private Mono<ResumenContenedores> getResumenContenedores(LocalDate data) {

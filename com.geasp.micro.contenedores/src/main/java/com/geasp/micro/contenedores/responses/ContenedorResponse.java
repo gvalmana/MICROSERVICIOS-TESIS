@@ -47,7 +47,8 @@ public class ContenedorResponse implements Serializable{
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private LocalDate fecha_extraccion;
 	@JsonFormat(pattern="yyyy-MM-dd")
-	private LocalDate fecha_devolucion;	
+	private LocalDate fecha_devolucion;
+	
 	public ContenedorResponse() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -252,5 +253,5 @@ public class ContenedorResponse implements Serializable{
 	public void setFecha_devolucion(LocalDate fecha_devolucion) {
 		this.fecha_devolucion = fecha_devolucion;
 	}
-	
+
 }

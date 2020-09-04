@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -11,11 +12,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
-import org.springframework.data.history.RevisionMetadata;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Table(name = "tbl_guias", catalog = "bd_guias")
 @Audited
 @ApiModel("Representa una guía aerea")
+@EntityListeners(AuditingEntityListener.class) // add this line
 public class Guia extends Auditable<String> {
 	
 	@Id

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -25,6 +27,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Table(name = "tbl_contenedores", catalog = "bd_contenedores")
 @Audited
 @ApiModel("Representa un contenedor como entidad")
+@EntityListeners(AuditingEntityListener.class) // add this line
 public class Contenedor extends Auditable<String>{
 	
 	@Id

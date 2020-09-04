@@ -1,11 +1,13 @@
 package com.geasp.micro.partes.models;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Resumen {
 
 	private String titulo;
+	private LocalDate fecha;
 	private int total;
 	private List<CantidadEmpresa> listosParaExtraer;
 	private Estadia enEstadia;
@@ -75,4 +77,14 @@ public class Resumen {
 	public void setResumenSalidas(Operaciones resumenSalidas) {
 		this.resumenSalidas = resumenSalidas;
 	}
+
+	public LocalDate getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(LocalDate fecha) {
+		this.fecha = fecha;
+	}
+	
+	
 }

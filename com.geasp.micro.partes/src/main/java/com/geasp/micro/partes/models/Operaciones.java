@@ -28,6 +28,11 @@ public class Operaciones {
 		this.cantidad = lista.size();
 	}
 
+	public Operaciones(String titulo) {
+		super();
+		this.titulo = titulo;
+	}
+
 	public String getTitulo() {
 		return titulo;
 	}

@@ -1,4 +1,4 @@
-package com.geasp.micro.partes.resources;
+package com.geasp.micro.partes.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.geasp.micro.partes.models.Parte;
 import com.geasp.micro.partes.services.IParte;
+import com.geasp.micro.partes.services.ParteService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -32,7 +33,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 public class ParteController {
 
 	@Autowired
-	private IParte servicio;
+	private ParteService servicio;
 	
 	private static final String MAIN_SERVICE = "mainService";
 	
