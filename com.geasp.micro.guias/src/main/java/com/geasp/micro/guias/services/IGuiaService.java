@@ -14,6 +14,7 @@ public interface IGuiaService<T,R> {
 	public List<T> listar();
 	public List<T> listarPorFechaArribo(LocalDate date);
 	public List<T> listarPorEstado(EstadoMercancias estado);
+	public List<T> listarPorEstados(List<EstadoMercancias> estados);
 	public T updateById(R request, Long id);
 	public T desactivateById(Long id);
 	public T deleteById(Long id);

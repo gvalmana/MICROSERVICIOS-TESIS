@@ -262,6 +262,7 @@ public class GuiaService implements IGuiaService<GuiaResponse, GuiaRequest>{
 				Guia guia = optional.get();
 				guia.setEstado(EstadoMercancias.EXTRAIDA);
 				guia.setFecha_extraccion(date.getFecha());
+				dao.saveAndFlush(guia);
 				GuiaResponse response = mapper.map(guia, GuiaResponse.class);
 				mappearDatos(guia, response);
 				return response;
@@ -292,6 +293,20 @@ public class GuiaService implements IGuiaService<GuiaResponse, GuiaRequest>{
 				return response;
 			} else {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Guía no encontrada");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public List<GuiaResponse> listarPorEstados(List<EstadoMercancias> estados) {
+		try {
+			List<Guia> guias = dao.findByEstadoIn(estados);
+			if (guias.size()>0) {
+				return llenarLista(guias).stream().collect(Collectors.toList());
+			} else {
+				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de guías aereas no encontrados");
 			}
 		} catch (ResponseStatusException e) {
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());

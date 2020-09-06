@@ -1,5 +1,6 @@
 package com.geasp.micro.partes.controllers;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +10,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.geasp.micro.partes.models.ResumenCargas;
+import com.geasp.micro.partes.models.ResumenGuias;
 import com.geasp.micro.partes.models.ResumenPendientes;
 import com.geasp.micro.partes.services.ContenedorService;
+import com.geasp.micro.partes.services.GuiaService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -34,7 +39,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 public class GuiaController {
 
 	@Autowired
-	private ContenedorService service;
+	private GuiaService service;
 	private static final String MAIN_SERVICE = "mainService";
 	
 	@GetMapping
@@ -47,5 +52,11 @@ public class GuiaController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.NO_CONTENT);
+	}
+	
+	@GetMapping("parte/fecha={fecha}")
+	public ResponseEntity<ResumenGuias> getParte(@PathVariable("fecha") String fecha){
+		LocalDate date = LocalDate.parse(fecha);
+		return ResponseEntity.ok(service.getParteByDate(date));
 	}
 }

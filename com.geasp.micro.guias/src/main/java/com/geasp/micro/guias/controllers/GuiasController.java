@@ -95,6 +95,13 @@ public class GuiasController implements IGuiasControllers<GuiaResponse, GuiaRequ
 		return ResponseEntity.ok(service.listarPorEstado(estado));
 	}
 	
+	@GetMapping(value = "/buscarporestados")
+	@ApiOperation(value = "Lista todas las cargas dado varios estados")
+	public ResponseEntity<List<GuiaResponse>> getAllByStates(@RequestParam(name = "estados",defaultValue = "[LISTO_PARA_EXTRAER]") List<EstadoMercancias> estados) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.listarPorEstados(estados));
+	}	
+	
 	@GetMapping(value = "/pendientes")
 	@ApiOperation(value = "Realiza un resumen de todas las guias pendientes a extraer por cada cliente")
 	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")
@@ -127,11 +134,5 @@ public class GuiasController implements IGuiasControllers<GuiaResponse, GuiaRequ
 	public ResponseEntity<GuiaResponse> revertById(@PathVariable("id") Long id) {
 		// TODO Auto-generated method stub
 		return ResponseEntity.ok(service.revertById(id));
-	}
-
-	@Override
-	public ResponseEntity<List<GuiaResponse>> getAllByStates(List<EstadoMercancias> estado) {
-		// TODO Auto-generated method stub
-		return null;
 	}	
 }
