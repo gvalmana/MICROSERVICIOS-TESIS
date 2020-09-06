@@ -1,5 +1,6 @@
 package com.geasp.micro.partes.conf;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.geasp.micro.partes.models.Cliente;
 
+
+/*CLASE PARA CREAR UN BEAN QUE VA A BUSCAR LA LISTA DE CLIENTES EN UNA PETICION HTTP*/
 public class ClientesHelper {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
@@ -19,7 +22,7 @@ public class ClientesHelper {
 	private KeycloakSecurityContext securityContext;
 	
 	public List<Cliente> buscarTodasLasEmpresas() {
-		return webClientBuilder.build().get()
+		List<Cliente> clientes = webClientBuilder.build().get()
 				.uri("http://EMPRESAS/v1/clientes/")
 				.headers(header->{
 					header.setBearerAuth(securityContext.getTokenString());
@@ -27,5 +30,10 @@ public class ClientesHelper {
 				})
 				.retrieve()
 				.bodyToMono(new ParameterizedTypeReference<List<Cliente>>() {}).block();
+		if (clientes != null) {
+			return clientes;
+		} else {
+			return new ArrayList<Cliente>();
+		}
 	}
 }

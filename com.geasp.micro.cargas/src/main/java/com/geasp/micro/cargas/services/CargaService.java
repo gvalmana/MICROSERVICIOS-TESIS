@@ -2,41 +2,26 @@ package com.geasp.micro.cargas.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.dozer.Mapper;
-import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.geasp.micro.cargas.Calculos;
 import com.geasp.micro.cargas.models.Carga;
-import com.geasp.micro.cargas.models.Cliente;
 import com.geasp.micro.cargas.models.EstadoMercancias;
 import com.geasp.micro.cargas.repositories.CargaRepository;
 import com.geasp.micro.cargas.requets.CargaRequest;
 import com.geasp.micro.cargas.requets.OperacionRequest;
 import com.geasp.micro.cargas.responses.CargaResponse;
-import com.geasp.micro.cargas.responses.ResumenPendientes;
-
-import reactor.core.publisher.Mono;
 
 @Service
 public class CargaService implements ICargaService<CargaResponse, CargaRequest> {
-	
-	@Autowired
-	private KeycloakSecurityContext securityContext;
-	
-	@Autowired
-	private WebClient.Builder webClientBuilder;
 	
 	@Autowired
 	private CargaRepository dao;
@@ -192,48 +177,6 @@ public class CargaService implements ICargaService<CargaResponse, CargaRequest> 
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
 	}
-	private Mono<List<Cliente>> buscarTodasLasEmpresas() {
-		return webClientBuilder.build().get()
-				.uri("http://EMPRESAS/v1/clientes/")
-				.headers(header->{
-					header.setBearerAuth(securityContext.getTokenString());
-					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-				})
-				.retrieve()
-				.bodyToMono(new ParameterizedTypeReference<List<Cliente>>() {});
-	}
-	
-	public List<ResumenPendientes> listarPendientes(){
-		List<ResumenPendientes> res = new ArrayList<ResumenPendientes>();
-		List<Cliente> clientes = buscarTodasLasEmpresas().block();
-		List<Carga> cargas = dao.findByEstado(EstadoMercancias.LISTO_PARA_EXTRAER);
-
-		clientes.stream().forEach(index->{
-			int total=0;
-			int porHabilitar=0;
-			int sinEntregar=0;
-			int sinDescargar=0;
-			int paraExtraer=0;
-			for (Carga carga : cargas) {
-				if (carga.getCliente().equals(index.getNombre())) {
-					total++;
-					if (carga.getFecha_habilitacion()==null) {
-						porHabilitar++;
-					}else if (carga.getFecha_documentos()==null) {
-						sinEntregar++;
-					}else if(carga.getFecha_arribo()==null) {
-						sinDescargar++;
-					}
-					paraExtraer = total-porHabilitar-sinEntregar-sinDescargar;
-				}				
-			}
-			if (total>0) {
-				res.add(new ResumenPendientes(index.getNombre(), total, paraExtraer, porHabilitar, sinEntregar, sinDescargar));
-			}
-		});
-		
-		return res;
-	}
 
 	@Override
 	public CargaResponse deleteById(Long id) {
@@ -292,6 +235,20 @@ public class CargaService implements ICargaService<CargaResponse, CargaRequest> 
 				return response;
 			} else {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"La carga a actualizar no existe");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public List<CargaResponse> listarPorEstados(List<EstadoMercancias> estados) {
+		try {			
+			List<Carga> cargas = dao.findByEstadoIn(estados);
+			if (cargas.size()>0) {
+				return llenarLista(cargas).stream().collect(Collectors.toList());
+			} else {
+				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de cargas agrupadas no encontrados");
 			}
 		} catch (ResponseStatusException e) {
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());

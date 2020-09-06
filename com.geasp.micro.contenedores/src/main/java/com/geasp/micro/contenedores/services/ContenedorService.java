@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.history.Revisions;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -251,5 +252,24 @@ public class ContenedorService implements IContenedorService<ContenedorResponse,
 		} catch (ResponseStatusException e) {
 			throw new ResponseStatusException(e.getStatus(), e.getMessage());
 		}
+	}
+
+	@Override
+	public List<ContenedorResponse> listarPorEstados(List<EstadoMercancias> estados) {
+		try {
+			List<Contenedor> contenedores = dao.findByEstadoIn(estados);
+			if (contenedores.size()>0) {
+				return llenarLista(contenedores.stream().collect(Collectors.toList()));
+			} else {
+				throw new ResponseStatusException(HttpStatus.NO_CONTENT,"Lista de contenedores no encontrados");
+			}
+		} catch (ResponseStatusException e) {
+			throw new ResponseStatusException(e.getStatus(), e.getMessage());
+		}
+	}
+
+	@Override
+	public Revisions<Integer, Contenedor> findRevisions(Long id) {
+		return dao.findRevisions(id);
 	}
 }

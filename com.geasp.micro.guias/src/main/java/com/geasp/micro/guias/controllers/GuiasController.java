@@ -127,5 +127,11 @@ public class GuiasController implements IGuiasControllers<GuiaResponse, GuiaRequ
 	public ResponseEntity<GuiaResponse> revertById(@PathVariable("id") Long id) {
 		// TODO Auto-generated method stub
 		return ResponseEntity.ok(service.revertById(id));
+	}
+
+	@Override
+	public ResponseEntity<List<GuiaResponse>> getAllByStates(List<EstadoMercancias> estado) {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }

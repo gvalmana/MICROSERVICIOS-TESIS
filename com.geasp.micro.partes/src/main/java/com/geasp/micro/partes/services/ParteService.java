@@ -82,39 +82,4 @@ public class ParteService implements IParte {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-//	private Mono<ResumenContenedores> getResumenContenedores(LocalDate data) {
-//		return webClientBuilder.build().get()
-//				.uri("http://MERCANCIAS/contenedores/parte/fecha="+data)
-//				.headers(header->{
-//					header.setBearerAuth(securityContext.getTokenString());
-//					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//				})
-//				.retrieve()
-//				.bodyToMono(ResumenContenedores.class);
-//	}
-	
-	
-//	private Mono<ResumenCargas> getResumenCargas(LocalDate data) {
-//		return webClientBuilder.build().get()
-//				.uri("http://MERCANCIAS/cargas/parte/fecha="+data)
-//				.headers(header->{
-//					header.setBearerAuth(securityContext.getTokenString());
-//					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//				})
-//				.retrieve()
-//				.bodyToMono(ResumenCargas.class);
-//	}
-	
-//	private Mono<ResumenGuias> getResumenGuias(LocalDate data) {
-//		return webClientBuilder.build().get()
-//				.uri("http://MERCANCIAS/guias/parte/fecha="+data)
-//				.headers(header->{
-//					header.setBearerAuth(securityContext.getTokenString());
-//					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//				})
-//				.retrieve()
-//				.bodyToMono(ResumenGuias.class);
-//	}
-
 }

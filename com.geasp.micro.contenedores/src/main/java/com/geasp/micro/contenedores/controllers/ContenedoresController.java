@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.history.Revisions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.geasp.micro.contenedores.models.Contenedor;
 import com.geasp.micro.contenedores.models.EstadoMercancias;
 import com.geasp.micro.contenedores.requests.ContenedorRequest;
 import com.geasp.micro.contenedores.requests.OperacionRequest;
@@ -115,5 +118,19 @@ public class ContenedoresController implements IContenedorController<ContenedorR
 	public ResponseEntity<ContenedorResponse> deleteById(@PathVariable("id") Long id) {
 		// TODO Auto-generated method stub
 		return ResponseEntity.ok(service.deleteById(id));
+	}
+
+	@Override
+	@GetMapping(value = "/buscarporestados")
+	@ApiOperation(value = "Busca todos los contenedores por varios estados", notes = "Devuelve la lista de contenedores")
+	public ResponseEntity<List<ContenedorResponse>> getAllByStates(@RequestParam(name = "estados",defaultValue = "[LISTO_PARA_EXTRAER]") List<EstadoMercancias> estados) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.listarPorEstados(estados));
+	}
+
+	@Override
+	@GetMapping(value = "/auditar/{id}")
+	public ResponseEntity<Revisions<Integer, Contenedor>> findRevisions(@PathVariable("id") Long id){
+		return ResponseEntity.ok(service.findRevisions(id));
 	}	
 }

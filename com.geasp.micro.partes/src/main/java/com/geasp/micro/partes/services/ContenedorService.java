@@ -51,9 +51,9 @@ public class ContenedorService implements IParte{
 	@Value("${partes.operaciones.contenedores.salidas}")
 	private String tituloSalidas;
 	
-	private List<Contenedor> getAll() {
+	private List<Contenedor> getAll(String url) {
 		List<Contenedor> res =  webClientBuilder.build().get()
-				.uri("http://CONTENEDORES/v1")
+				.uri(url)
 				.headers(header->{
 					header.setBearerAuth(securityContext.getTokenString());
 					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -65,38 +65,6 @@ public class ContenedorService implements IParte{
 		}else {
 			return new ArrayList<Contenedor>();
 		}
-	}
-	
-	private List<Contenedor> getPorDevolver() {
-		List<Contenedor> res =  webClientBuilder.build().get()
-				.uri("http://CONTENEDORES/v1/buscarporestado?estado=EXTRAIDA")
-				.headers(header->{
-					header.setBearerAuth(securityContext.getTokenString());
-					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-				})
-				.retrieve()
-				.bodyToMono(new ParameterizedTypeReference<List<Contenedor>>() {}).block();
-		if (res !=null) {
-			return res;
-		}else {
-			return new ArrayList<Contenedor>();
-		}
-	}
-	
-	private List<Contenedor> getPorExtraer() {
-		List<Contenedor> res = webClientBuilder.build().get()
-				.uri("http://CONTENEDORES/v1/buscarporestado?estado=LISTO_PARA_EXTRAER")
-				.headers(header->{
-					header.setBearerAuth(securityContext.getTokenString());
-					header.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-				})
-				.retrieve()
-				.bodyToMono(new ParameterizedTypeReference<List<Contenedor>>() {}).block();
-		if (res !=null) {
-			return res;
-		}else {
-			return new ArrayList<Contenedor>();
-		}		
 	}
 	
 	private List<CantidadEmpresa> listarPorEmpresas(List<Contenedor> data){
@@ -134,9 +102,12 @@ public class ContenedorService implements IParte{
 	
 	@Override
 	public List<ResumenPendientes> getPendientes(){
+		
+		String url = "http://CONTENEDORES/v1/buscarporestados?estados=LISTO_PARA_EXTRAER";
+		
 		List<ResumenPendientes> res = new ArrayList<ResumenPendientes>();
 		List<Cliente> clientes = clientesApi.buscarTodasLasEmpresas();
-		List<Contenedor> contenedores = getPorExtraer();
+		List<Contenedor> contenedores = getAll(url);
 
 		clientes.stream().forEach(index->{
 			int total=0;
@@ -166,16 +137,16 @@ public class ContenedorService implements IParte{
 	}	
 	
 	public List<CantidadEmpresa> listarContenedoresDevolver(){
-		List<Contenedor> lista = getPorDevolver();
+		String url = "http://CONTENEDORES/v1/buscarporestados?estados=EXTRAIDA";
+		List<Contenedor> lista = getAll(url);
 		List<CantidadEmpresa> resumenOperaciones = listarPorEmpresas(lista);
 		return resumenOperaciones.stream().collect(Collectors.toList());
 	}
 	
 	public ResumenContenedores getParteByDate(LocalDate date) {
 		ResumenContenedores res = new ResumenContenedores(contenedoresNombre);
-		
-		List<Contenedor> contenedores = getAll();
-		
+		String url = "http://CONTENEDORES/v1/buscarporestados?estados=LISTO_PARA_EXTRAER,EXTRAIDA";
+		List<Contenedor> contenedores = getAll(url);
 		List<Contenedor> paraExtraer = new ArrayList<Contenedor>();
 		List<Contenedor> paraDevolver = new ArrayList<Contenedor>();
 		
@@ -194,7 +165,7 @@ public class ContenedorService implements IParte{
 				
 		List<Contenedor> listaEntradas = contenedores.stream().filter(index->{
 			if (index.getFecha_arribo()!=null) {
-				return index.getFecha_arribo().equals(date) && index.getEstado().equals("Listo para extraer");
+				return index.getFecha_arribo().equals(date);
 			} else {
 				return false;
 			}
@@ -202,7 +173,7 @@ public class ContenedorService implements IParte{
 		
 		List<Contenedor> listaSalidas = contenedores.stream().filter(index->{
 			if (index.getFecha_extraccion()!=null) {
-				return index.getFecha_extraccion().equals(date) && index.getEstado().equals("Extraido");
+				return index.getFecha_extraccion().equals(date);
 			} else {
 				return false;
 			}

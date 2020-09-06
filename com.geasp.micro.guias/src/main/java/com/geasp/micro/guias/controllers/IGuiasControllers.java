@@ -13,6 +13,7 @@ public interface IGuiasControllers<T,R> {
 	public ResponseEntity<T> Save(R entity);
 	public ResponseEntity<List<T>> getAll();
 	public ResponseEntity<List<T>> getAllByState(EstadoMercancias estado);
+	public ResponseEntity<List<T>> getAllByStates(List<EstadoMercancias> estado);
 	public ResponseEntity<T> getById(Long id);
 	public ResponseEntity<T> updateById(R data, Long id);
 	public ResponseEntity<T> desactivateById(Long id);

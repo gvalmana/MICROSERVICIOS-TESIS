@@ -34,6 +34,11 @@ public class Resumen {
 	public Resumen() {
 		super();
 		// TODO Auto-generated constructor stub
+		this.listosParaExtraer = new ArrayList<CantidadEmpresa>();
+		this.enEstadia = new Estadia();
+		this.pendientesAlistar = new PendientesAlistar();
+		this.resumenEntradas = new Operaciones();
+		this.resumenSalidas = new Operaciones();		
 	}
 
 	public Resumen(String titulo) {
@@ -42,6 +47,8 @@ public class Resumen {
 		this.listosParaExtraer = new ArrayList<CantidadEmpresa>();
 		this.enEstadia = new Estadia();
 		this.pendientesAlistar = new PendientesAlistar();
+		this.resumenEntradas = new Operaciones();
+		this.resumenSalidas = new Operaciones();
 	}
 	public Estadia getEnEstadia() {
 		return enEstadia;

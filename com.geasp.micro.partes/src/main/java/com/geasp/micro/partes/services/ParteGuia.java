@@ -34,7 +34,7 @@ public class ParteGuia {
 	private int estadiaGuias;
 	@Value("${partes.guias.nombre}")
 	private String guiasNombre;
-	@Value("${partes.operaciones.guias.nombre}")
+	@Value("${partes.operaciones.guias.entradas}")
 	private String titulo;
 	
 	public ResumenGuias getResumenGuias(LocalDate date) {

@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.geasp.micro.partes.models.CantidadEmpresa;
-import com.geasp.micro.partes.models.ResumenContenedores;
+import com.geasp.micro.partes.models.ResumenCargas;
 import com.geasp.micro.partes.models.ResumenPendientes;
-import com.geasp.micro.partes.services.ContenedorService;
+import com.geasp.micro.partes.services.CargaService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
-@RequestMapping(value = "/contenedores")
+@RequestMapping(value = "/cargas")
 @CrossOrigin(
 		origins = "*", 
 		methods = {
@@ -35,10 +34,10 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 				RequestMethod.OPTIONS}, 
 		allowedHeaders = "*", 
 		allowCredentials = "true" )
-public class ContenedorController {
+public class CargaController {
 
 	@Autowired
-	private ContenedorService service;
+	private CargaService service;
 	private static final String MAIN_SERVICE = "mainService";
 	
 	@GetMapping
@@ -53,20 +52,8 @@ public class ContenedorController {
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.NO_CONTENT);
 	}
 	
-	@GetMapping(value = "/pordevolver")
-	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "resumenPorDevolverCallback")
-	//@ApiOperation(value = "Crea un resumen de los contenedores por devolver por cada cliente")
-	public ResponseEntity<List<CantidadEmpresa>> getResumenPorDevolver(){
-		return ResponseEntity.ok(service.listarContenedoresDevolver());
-	}
-	public ResponseEntity<List<CantidadEmpresa>> resumenPorDevolverCallback(Exception e){
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
-		return new ResponseEntity<List<CantidadEmpresa>>(new ArrayList<CantidadEmpresa>(), headers, HttpStatus.NO_CONTENT);	
-	}
-	
 	@GetMapping("parte/fecha={fecha}")
-	public ResponseEntity<ResumenContenedores> getParte(@PathVariable("fecha") String fecha){
+	public ResponseEntity<ResumenCargas> getParte(@PathVariable("fecha") String fecha){
 		LocalDate date = LocalDate.parse(fecha);
 		return ResponseEntity.ok(service.getParteByDate(date));
 	}

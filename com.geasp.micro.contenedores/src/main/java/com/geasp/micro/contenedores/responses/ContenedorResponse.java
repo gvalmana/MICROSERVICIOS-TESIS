@@ -253,5 +253,5 @@ public class ContenedorResponse implements Serializable{
 	public void setFecha_devolucion(LocalDate fecha_devolucion) {
 		this.fecha_devolucion = fecha_devolucion;
 	}
-
+	
 }

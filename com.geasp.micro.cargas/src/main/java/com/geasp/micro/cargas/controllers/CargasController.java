@@ -1,13 +1,10 @@
 package com.geasp.micro.cargas.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,10 +22,7 @@ import com.geasp.micro.cargas.models.EstadoMercancias;
 import com.geasp.micro.cargas.requets.CargaRequest;
 import com.geasp.micro.cargas.requets.OperacionRequest;
 import com.geasp.micro.cargas.responses.CargaResponse;
-import com.geasp.micro.cargas.responses.ResumenPendientes;
 import com.geasp.micro.cargas.services.CargaService;
-
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -50,8 +44,6 @@ public class CargasController implements ICargasControllers<CargaResponse, Carga
 
 	@Autowired
 	private CargaService service;
-	
-	private static final String MAIN_SERVICE = "mainService";
 	
 	@Override
 	@PostMapping
@@ -95,18 +87,6 @@ public class CargasController implements ICargasControllers<CargaResponse, Carga
 		return ResponseEntity.ok(service.listarPorEstado(estado));
 	}
 	
-	@GetMapping(value = "/pendientes")
-	@ApiOperation(value = "Lista un resumen de cargas agrupadas por cada cliente")
-	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")	
-	public ResponseEntity<List<ResumenPendientes>> getResumenPendietnes(){
-		return ResponseEntity.ok(service.listarPendientes());
-	}
-	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
-		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
 	@Override
 	@DeleteMapping(value = "/{id}")
 	@ApiOperation(value = "Elimina una carga", notes = "Elimina  una carga por su ID")	
@@ -128,5 +108,13 @@ public class CargasController implements ICargasControllers<CargaResponse, Carga
 	public ResponseEntity<CargaResponse> revertById(@PathVariable("id") Long id) {
 		// TODO Auto-generated method stub
 		return ResponseEntity.ok(service.revertById(id));
+	}
+
+	@Override
+	@GetMapping(value = "/buscarporestados")
+	@ApiOperation(value = "Lista todas las cargas dado varios estados")
+	public ResponseEntity<List<CargaResponse>> getAllByStates(@RequestParam(name = "estados",defaultValue = "[LISTO_PARA_EXTRAER]") List<EstadoMercancias> estados) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(service.listarPorEstados(estados));
 	}	
 }
