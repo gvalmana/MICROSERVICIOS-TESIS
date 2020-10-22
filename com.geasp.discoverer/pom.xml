@@ -15,11 +15,15 @@
 	<description>Registro y descubrimiento de servicios con Eureka</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
 		<spring-cloud.version>Hoxton.SR1</spring-cloud.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>	
 <!-- 		DEPENDENCIA DE KYCLOAK PARA SEGURIDAD -->
 		<dependency>
 		    <groupId>org.keycloak</groupId>

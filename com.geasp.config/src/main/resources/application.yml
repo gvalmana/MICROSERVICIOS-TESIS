@@ -1,6 +1,6 @@
 server:
   port: 9091
-
+  
 spring:
   application:
     name: config-server
@@ -11,6 +11,7 @@ spring:
         git:
           uri: ${HOME}/code/configrepo
         prefix: /config
+        
 eureka:
   client:
     register-with-eureka: true

@@ -42,14 +42,14 @@ public class ContenedorController {
 	private static final String MAIN_SERVICE = "mainService";
 	
 	@GetMapping
-//	@ApiOperation(value = "Lista los contenedores pendientes por cada cliente")	
 	@CircuitBreaker(name = MAIN_SERVICE, fallbackMethod = "getResumenPendientesCallback")
 	ResponseEntity<List<ResumenPendientes>> getPendietnes(){
 		return ResponseEntity.ok(service.getPendientes());
 	}
 	public ResponseEntity<List<ResumenPendientes>> getResumenPendientesCallback(Exception e){
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("message", "Ha ocurrido un error de comunicación entre servidores. Por favor comunique a soporte técnico.");		
+		headers.add("message", 
+				"Ha ocurrido un error en la operación. Por favor comunique a soporte técnico.");		
 		return new ResponseEntity<List<ResumenPendientes>>(new ArrayList<ResumenPendientes>(), headers, HttpStatus.NO_CONTENT);
 	}
 	

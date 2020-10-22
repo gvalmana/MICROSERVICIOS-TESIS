@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.geasp.micro.partes.models.ResumenCargas;
 import com.geasp.micro.partes.models.ResumenGuias;
 import com.geasp.micro.partes.models.ResumenPendientes;
-import com.geasp.micro.partes.services.ContenedorService;
 import com.geasp.micro.partes.services.GuiaService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
